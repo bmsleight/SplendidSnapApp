@@ -114,25 +114,48 @@ class IconPositionsGroup:
         return self.group
     def populate(self):
         p = IconPositions()
-        '''
-        p.newSet(0,0,6, 
-                 0,0,3,
-                 6,3,3,
-                 4,6,5,
-                 1,6,3,
-                 0,9,3,
-                 0,12,5,
-                 5,8,4)
-        '''
-        p.newSet(0,0,6, 
-                 0,6,3,
-                 3,6,3,
-                 6,4,5,
-                 6,1,3,
-                 9,0,3,
-                 12,0,4,
-                 11,5,4)
+        p.newSet(0,5,4, 
+                 6,7,2,
+                 4,6,2,
+                 5,3,3,
+                 2,2,3,
+                 5,1,2,
+                 0,1,2,
+                 3,0,2)
         self.newGroup(p)
+        p = IconPositions()
+        p.newSet(0,0,4, 
+                 5,0,3,
+                 0,6,3,
+                 1,4,2,
+                 4,3,2,
+                 3,5,2,
+                 3,7,2,
+                 5,5,2)
+        self.newGroup(p)
+
+#http://stackoverflow.com/questions/6240113/what-are-the-mathematical-computational-principles-behind-this-game
+def simple_card_list(p):
+    cards = []
+    for i in range(p):
+        pictures=[]
+        for j in range(p):
+            pictures.append(i * p + j)
+        pictures.append(p*p)
+        cards.append(pictures)
+    for i in range(p):
+        for j in range(p):
+            pictures=[]
+            for k in range(p):
+                pictures.append(k * p + (j + i * k) % p)
+            pictures.append(p * p + 1 + i)
+            cards.append(pictures)
+     
+    pictures=[]
+    for i in range(p+1):
+        pictures.append(p * p + i)
+    cards.append(pictures)
+    return cards, p * p + p +1
 
 
 class TestApp(App):
@@ -144,33 +167,43 @@ class TestApp(App):
         rbuttons = SnapArrayButtonClass()
         positions = IconPositionsGroup()
         
-        x = 0
-        y = 0
-        for i in os.listdir("../images/signs/")[:8]:
-            '''
+        cards, num_pictures = simple_card_list(7)
+        left_card = randint(0,len(cards))
+        right_card = randint(0,len(cards))
+        while left_card == right_card:
+            right_card = randint(0,len(cards))
+        card = cards[left_card]
+        print(cards[left_card], cards[right_card])
+        
+        index = 0
+        images = os.listdir("../images/signs/")
+        for i in range(0,8):
             rbutton = rbuttons.newRButton(layout.width, 
                                           layout.height,
-                                          x*3, y*3,
-                                          3,
-                                          "../images/signs/" + i,
-                                          "../images/signs/invert/"+ i
+                                          positions.group[0].config[index].x, 
+                                          positions.group[0].config[index].y,
+                                          positions.group[0].config[index].size,
+                                          "../images/signs/" + images[card[i]],
+                                          "../images/signs/invert/"+ images[card[i]]
                                           )
-            '''
-
-            rbutton = rbuttons.newRButton(layout.width, 
-                                          layout.height,
-                                          positions.group[0].config[x].x, 
-                                          positions.group[0].config[x].y,
-                                          positions.group[0].config[x].size,
-                                          "../images/signs/" + i,
-                                          "../images/signs/invert/"+ i
-                                          )
-            
-
-
-            x = x + 1
-
+            index = index + 1
             layout.add_widget(rbutton)
+
+        index = 0
+        card = cards[right_card]
+        for i in range(0,8):
+            rbutton = rbuttons.newRButton(layout.width, 
+                                          layout.height,
+                                          positions.group[1].config[index].x+8, 
+                                          positions.group[1].config[index].y,
+                                          positions.group[1].config[index].size,
+                                          "../images/signs/" + images[card[i]],
+                                          "../images/signs/invert/"+ images[card[i]]
+                                          )
+            index = index + 1
+            layout.add_widget(rbutton)
+
+
         return layout
 
 class MainApp(App):

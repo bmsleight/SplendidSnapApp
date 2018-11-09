@@ -3,6 +3,7 @@ from kivy.lang import Builder
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.popup import Popup
 
 from kivy.graphics.context_instructions import PopMatrix, PushMatrix
 from kivy.graphics import Rotate
@@ -14,11 +15,35 @@ from kivy.uix.behaviors import ToggleButtonBehavior
 
 from random import random, randint 
 import os
+from time import sleep
 
 from kivy.config import Config
 Config.set('graphics', 'width', '1024')
 Config.set('graphics', 'height', '576')
 
+
+
+
+class SnapFloatLayout(FloatLayout):
+    def __init__(self, **kwargs):
+        super(FloatLayout, self).__init__(**kwargs)
+        self.guess = "None"
+    def newGuess(self, guess):
+        if self.guess == "None":
+            self.guess = guess
+            return "New Guess"
+        else:
+            if self.guess == guess:
+                text = "Sucess!"
+            else:
+                text = "Failure!"
+            self.guess = "None"
+            return text
+            
+
+    def clearGuess(self, guess):
+        self.guess = "None"
+        return "New Guess"
 
 
 class IconButton(ToggleButtonBehavior, Image):
@@ -34,27 +59,38 @@ class IconButton(ToggleButtonBehavior, Image):
 
         self.bind(pos=self.update_canvas)
         self.bind(size=self.update_canvas)
+        
+        self.guess = None
 
     def update_canvas(self, *args):
         self.rotate.origin = self.center
+ 
+    def on_state(self, widget, value):
+        app= App.get_running_app()
         
 
-    def on_state(self, widget, value):
         if value == 'down':
             self.source = widget.img_dn
+            guess_result = app.root.newGuess(self.card_number)        
         else:
             self.source = widget.img_up
+            guess_result = app.root.clearGuess(self.card_number)        
+        if guess_result == "New Guess":
+            pass
+        else:
+            popup = Popup(title='Splendid Snap App',
+                      content=Label(text=guess_result), auto_dismiss=True)
+            popup.bind(on_touch_down=popup.dismiss)
+            popup.open() 
 
-#lass phaseArrayClass:
 
 class SnapArrayButtonClass:
     def __init__(self):
         self.rbuttons = []
-    def newRButton(self, w, h, x, y, size, img_up, img_dn):
+    def newRButton(self, w, h, x, y, size, img_up, img_dn, card_number):
         '''
         Images need to be bigger than canvas, so biggger than rotated button
         ''' 
-        print(w,h,x,y,size)
         rbutton = RelativeLayout(size_hint=(None, None), 
                                  size=(0.7*w*size/16, 0.7*h*size/9), 
                                  pos=(w*x/16 + 0.15*w*size/16, 
@@ -64,11 +100,12 @@ class SnapArrayButtonClass:
         btn.img_up = img_up
         btn.img_dn = img_dn
         btn.source = img_up
+        btn.card_number = card_number
         rbutton.add_widget(btn)
         self.rbuttons.append(rbutton)
-        with rbutton.canvas:
-            Color(random(), random(), random(), 0.24)
-            Rectangle(pos=(0,0), size=rbutton.size)
+#        with rbutton.canvas:
+#            Color(random(), random(), random(), 0.24)
+#            Rectangle(pos=(0,0), size=rbutton.size)
 
         return rbutton
 
@@ -112,6 +149,9 @@ class IconPositionsGroup:
         self.group.append(iconPositions)
     def groups(self):
         return self.group
+    def randomGroup(self):
+        i = randint(0,len(self.group)-1)
+        return self.group[i]
     def populate(self):
         p = IconPositions()
         p.newSet(0,5,4, 
@@ -133,6 +173,27 @@ class IconPositionsGroup:
                  3,7,2,
                  5,5,2)
         self.newGroup(p)
+        p = IconPositions()
+        p.newSet(0,0,3, 
+                 0,6,3,
+                 5,6,3,
+                 5,0,3,
+                 2,3,3,
+                 3,1,2,
+                 3,6,2,
+                 5,3,2)
+        self.newGroup(p)
+        p = IconPositions()
+        p.newSet(0,0,3, 
+                 2,3,4,
+                 3,0,3,
+                 6,3,2,
+                 6,7,2,
+                 3,7,2,
+                 0,7,2,
+                 0,5,2)
+        self.newGroup(p)
+
 
 #http://stackoverflow.com/questions/6240113/what-are-the-mathematical-computational-principles-behind-this-game
 def simple_card_list(p):
@@ -157,58 +218,56 @@ def simple_card_list(p):
     cards.append(pictures)
     return cards, p * p + p +1
 
+    
 
 class TestApp(App):
 
     def build(self):
-        layout = FloatLayout(size=(1024,576))
-        print(layout.size, layout.pos)
-        
+        layout = SnapFloatLayout(size=(1024,576))
+
         rbuttons = SnapArrayButtonClass()
         positions = IconPositionsGroup()
         
         cards, num_pictures = simple_card_list(7)
-        left_card = randint(0,len(cards))
-        right_card = randint(0,len(cards))
+        left_card = randint(0,len(cards)-1)
+        right_card = randint(0,len(cards)-1)
         while left_card == right_card:
             right_card = randint(0,len(cards))
         card = cards[left_card]
-        print(cards[left_card], cards[right_card])
         
         index = 0
+        randomGroup = positions.randomGroup()
         images = os.listdir("../images/signs/")
         for i in range(0,8):
             rbutton = rbuttons.newRButton(layout.width, 
                                           layout.height,
-                                          positions.group[0].config[index].x, 
-                                          positions.group[0].config[index].y,
-                                          positions.group[0].config[index].size,
+                                          randomGroup.config[index].x, 
+                                          randomGroup.config[index].y,
+                                          randomGroup.config[index].size,
                                           "../images/signs/" + images[card[i]],
-                                          "../images/signs/invert/"+ images[card[i]]
+                                          "../images/signs/invert/"+ images[card[i]],
+                                          card[i]
                                           )
             index = index + 1
             layout.add_widget(rbutton)
 
         index = 0
+        randomGroup = positions.randomGroup()
         card = cards[right_card]
         for i in range(0,8):
             rbutton = rbuttons.newRButton(layout.width, 
                                           layout.height,
-                                          positions.group[1].config[index].x+8, 
-                                          positions.group[1].config[index].y,
-                                          positions.group[1].config[index].size,
+                                          randomGroup.config[index].x+8, 
+                                          randomGroup.config[index].y,
+                                          randomGroup.config[index].size,
                                           "../images/signs/" + images[card[i]],
-                                          "../images/signs/invert/"+ images[card[i]]
+                                          "../images/signs/invert/"+ images[card[i]],
+                                          card[i]
                                           )
             index = index + 1
             layout.add_widget(rbutton)
 
 
-        return layout
-
-class MainApp(App):
-    def build(self):
-        layout = Builder.load_string(src)
         return layout
 
 

@@ -1,30 +1,27 @@
+
 from kivy.app import App
+from kivy.base import runTouchApp
+from kivy.core.window import Window
+from kivy.graphics import Color, Ellipse, Rectangle, Rotate
+from kivy.graphics.context_instructions import PopMatrix, PushMatrix
 from kivy.lang import Builder
+from kivy.properties import ListProperty
+from kivy.uix.behaviors import ToggleButtonBehavior
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.popup import Popup
-
-from kivy.graphics.context_instructions import PopMatrix, PushMatrix
-from kivy.graphics import Rotate
-from kivy.graphics import Color, Ellipse, Rectangle
-
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 
-from kivy.uix.behaviors import ToggleButtonBehavior
 
-from random import random, randint 
+import time
+from random import random, randint
 import os
-from time import sleep
-
-from kivy.config import Config
-Config.set('graphics', 'width', '1024')
-Config.set('graphics', 'height', '576')
 
 
-
-
-class SnapFloatLayout(FloatLayout):
+class SnapRelativeLayout(RelativeLayout):
     def __init__(self, **kwargs):
         super(FloatLayout, self).__init__(**kwargs)
         self.guess = "None"
@@ -45,33 +42,26 @@ class SnapFloatLayout(FloatLayout):
         self.guess = "None"
         return "New Guess"
 
-
 class IconButton(ToggleButtonBehavior, Image):
 
     def __init__(self, angle=0, **kwargs):
         super(IconButton, self).__init__(**kwargs)
-
         self.rotate = Rotate(angle = angle)
-
         self.canvas.before.add(PushMatrix())
         self.canvas.before.add(self.rotate)
         self.canvas.after.add(PopMatrix())
-
         self.bind(pos=self.update_canvas)
         self.bind(size=self.update_canvas)
-        
         self.guess = None
-
     def update_canvas(self, *args):
         self.rotate.origin = self.center
- 
     def on_state(self, widget, value):
         app= App.get_running_app()
-        
-
         if value == 'down':
             self.source = widget.img_dn
-            guess_result = app.root.newGuess(self.card_number)        
+            # Better way to access SnapRelativeLayout ? than 
+            #  self.parent.parent.parent ?
+            guess_result = self.parent.parent.newGuess(self.card_number)        
         else:
             self.source = widget.img_up
             guess_result = app.root.clearGuess(self.card_number)        
@@ -87,7 +77,7 @@ class IconButton(ToggleButtonBehavior, Image):
 class SnapArrayButtonClass:
     def __init__(self):
         self.rbuttons = []
-    def newRButton(self, w, h, x, y, size, img_up, img_dn, card_number):
+    def newRButton(self, w, h, x, y, size, img_up, img_dn, card_number, positional_offset=0):
         '''
         Images need to be bigger than canvas, so biggger than rotated button
         ''' 
@@ -103,10 +93,9 @@ class SnapArrayButtonClass:
         btn.card_number = card_number
         rbutton.add_widget(btn)
         self.rbuttons.append(rbutton)
-#        with rbutton.canvas:
-#            Color(random(), random(), random(), 0.24)
-#            Rectangle(pos=(0,0), size=rbutton.size)
-
+        with rbutton.canvas:
+            Color(random(), random(), random(), 0.24)
+            Rectangle(pos=(0,0), size=rbutton.size)
         return rbutton
 
 
@@ -218,59 +207,99 @@ def simple_card_list(p):
     cards.append(pictures)
     return cards, p * p + p +1
 
-    
 
-class TestApp(App):
+class IntroScreen(Screen):
+    pass
 
-    def build(self):
-        layout = SnapFloatLayout(size=(1024,576))
+class CardsScreen(Screen):
+    def __init__(self, **kwargs):
+        super(Screen, self).__init__(**kwargs)
+        self.new_set = True
+        self.guess = "None"
 
+    def newGuess(self, guess):
+        if self.guess == "None":
+            self.guess = guess
+            return "New Guess"
+        else:
+            if self.guess == guess:
+                text = "Sucess!"
+            else:
+                text = "Failure!"
+            self.guess = "None"
+            return text
+
+    def clearGuess(self, guess):
+        self.guess = "None"
+        return "New Guess"
+
+    def populateCards(self):
+        if self.new_set:
+            # Get size informatoin 
+            (max_x, max_y) = Window.size
+            max_x = (max_x/16) * 8 *2 # Allow for wierd aspect ratios
+
+            # Get set of cards for left and right
+            cards, num_pictures = simple_card_list(7)
+            left_card = randint(0,len(cards)-1)
+            right_card = randint(0,len(cards)-1)
+            while left_card == right_card:
+                right_card = randint(0,len(cards))
+
+            # Set left and rright
+            self.addCardsToFLayer("SnapFloatLayoutLeft", max_x, max_y, 
+                                  "./images/signs/", 
+                                  cards[left_card]
+                                  )
+            self.addCardsToFLayer("SnapFloatLayoutRight", max_x, max_y, 
+                                  "./images/signs/", 
+                                  cards[right_card]
+                                  )
+                                  
+        self.new_set = False
+
+    def addCardsToFLayer(self, layerId, max_x, max_y,
+                        img_location,
+                        card,
+                        positional_offset=0):
+        fl = getattr(self.ids, layerId)        
+
+        # Make buttons and get button positions
         rbuttons = SnapArrayButtonClass()
         positions = IconPositionsGroup()
-        
-        cards, num_pictures = simple_card_list(7)
-        left_card = randint(0,len(cards)-1)
-        right_card = randint(0,len(cards)-1)
-        while left_card == right_card:
-            right_card = randint(0,len(cards))
-        card = cards[left_card]
-        
-        index = 0
         randomGroup = positions.randomGroup()
-        images = os.listdir("../images/signs/")
+
+         
+        images = os.listdir(img_location)
         for i in range(0,8):
-            rbutton = rbuttons.newRButton(layout.width, 
-                                          layout.height,
-                                          randomGroup.config[index].x, 
-                                          randomGroup.config[index].y,
-                                          randomGroup.config[index].size,
-                                          "../images/signs/" + images[card[i]],
-                                          "../images/signs/invert/"+ images[card[i]],
+            rbutton = rbuttons.newRButton(max_x, 
+                                          max_y,
+                                          randomGroup.config[i].x, 
+                                          randomGroup.config[i].y,
+                                          randomGroup.config[i].size,
+                                          img_location + images[card[i]],
+                                          img_location + "invert/"+ images[card[i]],                                          
                                           card[i]
                                           )
-            index = index + 1
-            layout.add_widget(rbutton)
+            fl.add_widget(rbutton)
+    
 
-        index = 0
-        randomGroup = positions.randomGroup()
-        card = cards[right_card]
-        for i in range(0,8):
-            rbutton = rbuttons.newRButton(layout.width, 
-                                          layout.height,
-                                          randomGroup.config[index].x+8, 
-                                          randomGroup.config[index].y,
-                                          randomGroup.config[index].size,
-                                          "../images/signs/" + images[card[i]],
-                                          "../images/signs/invert/"+ images[card[i]],
-                                          card[i]
-                                          )
-            index = index + 1
-            layout.add_widget(rbutton)
+class NotifyScreen(Screen):
+    colour = ListProperty([1., 0., 0., 1.])
+
+class ResultsScreen(Screen):
+    colour = ListProperty([1., 0., 0., 1.])
+
+class MyScreenManager(ScreenManager):
+    blue   = ListProperty([0.19, 0.39, 0.78, .8])
+    orange = ListProperty([1, 0.61, 0, 1])
 
 
-        return layout
+class SplendidSnapApp(App):
+    def build(self):
+        return Builder.load_file('SplendidSnap.kv')
 
 
-if __name__ == '__main__':
-    TestApp().run()
-
+if __name__ == "__main__":
+    SplendidSnapApp().run()
+    

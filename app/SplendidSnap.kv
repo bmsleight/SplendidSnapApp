@@ -1,0 +1,90 @@
+#:import Window kivy.core.window.Window
+
+MyScreenManager:
+    IntroScreen:
+    CardsScreen:
+    NotifyScreen:
+    ResultsScreen:
+
+<MenuButton@Button>:
+    background_normal: ''
+    color: (0.19, 0.39, 0.78, .8)
+    font_size: sp(50)
+    
+<IntroScreen>:
+    name: 'intro'
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle: 
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            source: 'assets/logo.png'
+            allow_stretch: True
+            keep_ratio: True
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                MenuButton:
+                    text: 'Start Solo Game'
+                    on_release: app.root.current = 'cards'
+            BoxLayout:
+                MenuButton:
+                    text: 'Start Multi Player Game'
+            BoxLayout:
+                MenuButton:
+                    text: 'Quit'
+                    on_release: app.stop()
+            BoxLayout:
+
+<CardsScreen>:
+    name: 'cards'
+    on_pre_enter: root.populateCards()
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            canvas:
+                Color:
+                    rgba: root.manager.orange
+                Rectangle:
+                    size: self.size
+                    pos: self.pos            
+            SnapRelativeLayout:
+                id: SnapFloatLayoutLeft
+                MenuButton:
+                    text: 's'
+                    on_release: app.root.current = 'notify'
+        BoxLayout:
+            orientation: 'vertical'
+            canvas:
+                Color:
+                    rgba: root.manager.blue
+                Rectangle:
+                    size: self.size
+                    pos: self.pos           
+            SnapRelativeLayout:
+                id: SnapFloatLayoutRight
+                MenuButton:
+                    text: 'back'
+                    on_release: app.root.current = 'intro'
+
+<NotifyScreen>:
+    name: 'notify'
+    BoxLayout:
+        Button:
+            text: 'goto first screen'
+            font_size: 30
+            on_release: app.root.current = 'results'
+
+<ResultsScreen>:
+    name: 'results'
+    BoxLayout:
+        Button:
+            text: 'goto first screen'
+            font_size: 30
+            on_release: app.root.current = 'intro'
+

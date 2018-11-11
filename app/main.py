@@ -5,7 +5,7 @@ from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse, Rectangle, Rotate
 from kivy.graphics.context_instructions import PopMatrix, PushMatrix
 from kivy.lang import Builder
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, StringProperty
 from kivy.uix.behaviors import ToggleButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
@@ -20,6 +20,7 @@ import time
 from random import random, randint
 import os
 
+TOTALWIN = 2
 
 class SnapRelativeLayout(RelativeLayout):
     def __init__(self, **kwargs):
@@ -52,13 +53,21 @@ class IconButton(ToggleButtonBehavior, Image):
         if guess_result == "New Guess":
             pass
         else:
-            popup = Popup(title='Splendid Snap App',
-                      content=Label(text=guess_result), auto_dismiss=True)
-            popup.bind(on_touch_down=popup.dismiss)
-            popup.open()
+            # We have two - so ether say failure or run success
+            #popup = Popup(title='Splendid Snap App',
+            #          content=Label(text=guess_result), auto_dismiss=True)
+            #popup.bind(on_touch_down=popup.dismiss)
+            #popup.open()
             if guess_result == "Sucess!":
-                screen.removeCardsFromFLayer()
-            #scroll.clear_widgets()
+                total_correct_return = screen.removeCardsFromFLayer()
+                if total_correct_return == -1:
+                    screen.manager.current = 'notify'
+                else:
+                    screen.parent.get_screen('results').labelText = guess_result + " You have made " + str(total_correct_return) + " correct matches"
+                    screen.manager.current = 'results'
+            else:
+                screen.parent.get_screen('results').labelText = guess_result + " Change at least one to a make a match"
+                screen.manager.current = 'results'
             
 
 class SnapArrayButtonClass:
@@ -271,23 +280,35 @@ class CardsScreen(Screen):
                                           )
             fl.add_widget(rbutton)
     def removeCardsFromFLayer(self):
+        total_correct_return = 0
         fl = getattr(self.ids, "SnapFloatLayoutLeft")
         fl.clear_widgets()
         fl = getattr(self.ids, "SnapFloatLayoutRight")
         fl.clear_widgets()
         self.total_correct = self.total_correct + 1
-        print("self.total_correct", self.total_correct)
-        print("self.current", self.manager.current)
-        if self.total_correct >= 5:
+        if self.total_correct >= TOTALWIN:
+            self.total_correct = 0
+            total_correct_return = -1
             self.manager.current = 'notify'
+        else:
+            total_correct_return = self.total_correct
         self.new_set = True
         self.populateCards()
+        print("self.total_correct", self.total_correct)
+        return total_correct_return
 
 class NotifyScreen(Screen):
     colour = ListProperty([1., 0., 0., 1.])
 
 class ResultsScreen(Screen):
-    colour = ListProperty([1., 0., 0., 1.])
+    labelText = StringProperty('My label')
+    nextS = StringProperty('intro')
+#    def __init__(self, **kwargs):
+#        super(Screen, self).__init__(**kwargs)
+#        self.labelText = StringProperty('My label')
+#        self.next_screen = StringProperty('intro')
+#        self.colour = ListProperty([1., 0., 0., 1.])
+    
 
 class MyScreenManager(ScreenManager):
     blue   = ListProperty([0.19, 0.39, 0.78, 1])

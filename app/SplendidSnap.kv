@@ -8,8 +8,9 @@ MyScreenManager:
 
 <MenuButton@Button>:
     background_normal: ''
+    background_color: (1, 0.61, 0, 1) if self.state == 'normal' else (0.19, 0.39, 0.78, 1) 
     color: (0.19, 0.39, 0.78, 1)
-    font_size: sp(50)
+    font_size: sp(25)
     
 <IntroScreen>:
     name: 'intro'
@@ -33,7 +34,10 @@ MyScreenManager:
                     on_release: app.root.current = 'cards'
             BoxLayout:
                 MenuButton:
-                    text: 'Start Multi Player Game'
+                    text: 'Start Multi Player Game (Not yet implemented)'
+            BoxLayout:
+                MenuButton:
+                    text: 'Start Multi Player Game (Not yet implemented)'
             BoxLayout:
                 MenuButton:
                     text: 'Quit'
@@ -69,8 +73,7 @@ MyScreenManager:
 <NotifyScreen>:
     name: 'notify'
     BoxLayout:
-        Button:
-            color: (1, 0.61, 0, 1)
+        MenuButton:
             text: 'Game Completed !'
             font_size: sp(150)
             on_release: app.root.current = 'intro'
@@ -78,8 +81,13 @@ MyScreenManager:
 <ResultsScreen>:
     name: 'results'
     BoxLayout:
-        Button:
-            text: 'goto first screen'
-            font_size: 30
-            on_release: app.root.current = 'intro'
-
+        canvas:
+            Color:
+                rgba: root.manager.blue
+            Rectangle:
+                size: self.size
+                pos: self.pos            
+        MenuButton:
+            font_size: sp(50)
+            text: root.labelText
+            on_release: root.manager.current = 'cards'

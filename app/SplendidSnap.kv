@@ -8,7 +8,7 @@ MyScreenManager:
 
 <MenuButton@Button>:
     background_normal: ''
-    color: (0.19, 0.39, 0.78, .8)
+    color: (0.19, 0.39, 0.78, 1)
     font_size: sp(50)
     
 <IntroScreen>:
@@ -55,9 +55,6 @@ MyScreenManager:
                     pos: self.pos            
             SnapRelativeLayout:
                 id: SnapFloatLayoutLeft
-                MenuButton:
-                    text: 's'
-                    on_release: app.root.current = 'notify'
         BoxLayout:
             orientation: 'vertical'
             canvas:
@@ -68,17 +65,15 @@ MyScreenManager:
                     pos: self.pos           
             SnapRelativeLayout:
                 id: SnapFloatLayoutRight
-                MenuButton:
-                    text: 'back'
-                    on_release: app.root.current = 'intro'
 
 <NotifyScreen>:
     name: 'notify'
     BoxLayout:
         Button:
-            text: 'goto first screen'
-            font_size: 30
-            on_release: app.root.current = 'results'
+            color: (1, 0.61, 0, 1)
+            text: 'Game Completed !'
+            font_size: sp(150)
+            on_release: app.root.current = 'intro'
 
 <ResultsScreen>:
     name: 'results'

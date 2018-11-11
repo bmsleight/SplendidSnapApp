@@ -1,0 +1,2 @@
+Logo : logomakr.com/5H5lm1
+convert logo.png -trim  -bordercolor transparent -border 20 logot2.png

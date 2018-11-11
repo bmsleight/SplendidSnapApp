@@ -24,23 +24,6 @@ import os
 class SnapRelativeLayout(RelativeLayout):
     def __init__(self, **kwargs):
         super(FloatLayout, self).__init__(**kwargs)
-        self.guess = "None"
-    def newGuess(self, guess):
-        if self.guess == "None":
-            self.guess = guess
-            return "New Guess"
-        else:
-            if self.guess == guess:
-                text = "Sucess!"
-            else:
-                text = "Failure!"
-            self.guess = "None"
-            return text
-            
-
-    def clearGuess(self, guess):
-        self.guess = "None"
-        return "New Guess"
 
 class IconButton(ToggleButtonBehavior, Image):
 
@@ -56,28 +39,32 @@ class IconButton(ToggleButtonBehavior, Image):
     def update_canvas(self, *args):
         self.rotate.origin = self.center
     def on_state(self, widget, value):
-        app= App.get_running_app()
+        # Better way to access SnapRelativeLayout ? than 
+        #  self.parent.parent.parent ?
+        # Tied too much into how kv is...
+        screen = self.parent.parent.parent.parent.parent
         if value == 'down':
-            self.source = widget.img_dn
-            # Better way to access SnapRelativeLayout ? than 
-            #  self.parent.parent.parent ?
-            guess_result = self.parent.parent.newGuess(self.card_number)        
+            self.source = "./assets/logo.png"
+            guess_result = screen.newGuess(self.card_number)
         else:
             self.source = widget.img_up
-            guess_result = app.root.clearGuess(self.card_number)        
+            guess_result = screen.clearGuess(self.card_number)        
         if guess_result == "New Guess":
             pass
         else:
             popup = Popup(title='Splendid Snap App',
                       content=Label(text=guess_result), auto_dismiss=True)
             popup.bind(on_touch_down=popup.dismiss)
-            popup.open() 
-
+            popup.open()
+            if guess_result == "Sucess!":
+                screen.removeCardsFromFLayer()
+            #scroll.clear_widgets()
+            
 
 class SnapArrayButtonClass:
     def __init__(self):
         self.rbuttons = []
-    def newRButton(self, w, h, x, y, size, img_up, img_dn, card_number, positional_offset=0):
+    def newRButton(self, w, h, x, y, size, img_up, card_number, positional_offset=0):
         '''
         Images need to be bigger than canvas, so biggger than rotated button
         ''' 
@@ -88,14 +75,15 @@ class SnapArrayButtonClass:
                                  )
         btn = IconButton(angle=randint(0,360))
         btn.img_up = img_up
-        btn.img_dn = img_dn
+        btn.img_dn = "./assets/logo.png"
         btn.source = img_up
         btn.card_number = card_number
         rbutton.add_widget(btn)
         self.rbuttons.append(rbutton)
-        with rbutton.canvas:
-            Color(random(), random(), random(), 0.24)
-            Rectangle(pos=(0,0), size=rbutton.size)
+        # Used for debugging, show canvas area
+#        with rbutton.canvas:
+#            Color(random(), random(), random(), 0.24)
+#            Rectangle(pos=(0,0), size=rbutton.size)
         return rbutton
 
 
@@ -216,6 +204,7 @@ class CardsScreen(Screen):
         super(Screen, self).__init__(**kwargs)
         self.new_set = True
         self.guess = "None"
+        self.total_correct = 0
 
     def newGuess(self, guess):
         if self.guess == "None":
@@ -278,11 +267,21 @@ class CardsScreen(Screen):
                                           randomGroup.config[i].y,
                                           randomGroup.config[i].size,
                                           img_location + images[card[i]],
-                                          img_location + "invert/"+ images[card[i]],                                          
                                           card[i]
                                           )
             fl.add_widget(rbutton)
-    
+    def removeCardsFromFLayer(self):
+        fl = getattr(self.ids, "SnapFloatLayoutLeft")
+        fl.clear_widgets()
+        fl = getattr(self.ids, "SnapFloatLayoutRight")
+        fl.clear_widgets()
+        self.total_correct = self.total_correct + 1
+        print("self.total_correct", self.total_correct)
+        print("self.current", self.manager.current)
+        if self.total_correct >= 5:
+            self.manager.current = 'notify'
+        self.new_set = True
+        self.populateCards()
 
 class NotifyScreen(Screen):
     colour = ListProperty([1., 0., 0., 1.])
@@ -291,7 +290,7 @@ class ResultsScreen(Screen):
     colour = ListProperty([1., 0., 0., 1.])
 
 class MyScreenManager(ScreenManager):
-    blue   = ListProperty([0.19, 0.39, 0.78, .8])
+    blue   = ListProperty([0.19, 0.39, 0.78, 1])
     orange = ListProperty([1, 0.61, 0, 1])
 
 

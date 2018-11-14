@@ -1,6 +1,7 @@
 
 from kivy.app import App
 from kivy.base import runTouchApp
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse, Rectangle, Rotate
 from kivy.graphics.context_instructions import PopMatrix, PushMatrix
@@ -14,13 +15,30 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
-
+from kivy.uix.widget import Widget
 
 import time
 from random import random, randint
 import os
 
-TOTALWIN = 2
+from settingsjson import settings_json
+
+
+class ClockRect(Widget):
+    def __init__(self, **kwargs):
+        super(ClockRect, self).__init__(**kwargs)
+        self.timer = Clock
+        self.dseconds = 0
+#        self.start()
+    def start(self):
+        self.event = self.timer.schedule_interval(self.update, 1/10.)
+    def pause(self):
+        self.event.cancel()
+        r = self.dseconds
+        self.dseconds = 0
+        return r
+    def update(self, *args):
+        self.dseconds = self.dseconds + 1
 
 class SnapRelativeLayout(RelativeLayout):
     def __init__(self, **kwargs):
@@ -37,6 +55,7 @@ class IconButton(ToggleButtonBehavior, Image):
         self.bind(pos=self.update_canvas)
         self.bind(size=self.update_canvas)
         self.guess = None
+#        self.allow_stretch = True
     def update_canvas(self, *args):
         self.rotate.origin = self.center
     def on_state(self, widget, value):
@@ -49,16 +68,13 @@ class IconButton(ToggleButtonBehavior, Image):
             guess_result = screen.newGuess(self.card_number)
         else:
             self.source = widget.img_up
-            guess_result = screen.clearGuess(self.card_number)        
+            guess_result = screen.clearGuess(self.card_number)
+        
+        # Got Sucess or Now Guess from buttons
         if guess_result == "New Guess":
             pass
         else:
-            # We have two - so ether say failure or run success
-            #popup = Popup(title='Splendid Snap App',
-            #          content=Label(text=guess_result), auto_dismiss=True)
-            #popup.bind(on_touch_down=popup.dismiss)
-            #popup.open()
-            if guess_result == "Sucess!":
+            if guess_result == "Success!":
                 total_correct_return = screen.removeCardsFromFLayer()
                 if total_correct_return == -1:
                     screen.manager.current = 'notify'
@@ -214,25 +230,38 @@ class CardsScreen(Screen):
         self.new_set = True
         self.guess = "None"
         self.total_correct = 0
-
+        self.total_dseconds = 0
     def newGuess(self, guess):
         if self.guess == "None":
             self.guess = guess
             return "New Guess"
         else:
             if self.guess == guess:
-                text = "Sucess!"
+                text = "Success!"
             else:
                 text = "Failure!"
             self.guess = "None"
             return text
-
     def clearGuess(self, guess):
         self.guess = "None"
         return "New Guess"
-
+    def clockStart(self):
+        clock = getattr(self.ids, "clock")
+        clock.start()
+    def clockStop(self):
+        clock = getattr(self.ids, "clock")
+        self.total_dseconds = self.total_dseconds + clock.pause()
+        print(self.total_dseconds)
+    def strTotal(self):
+        return "Total time: " + str(self.total_dseconds/10.) + "s"
     def populateCards(self):
         if self.new_set:
+            # clear old cards
+            fl = getattr(self.ids, "SnapFloatLayoutLeft")
+            fl.clear_widgets()
+            fl = getattr(self.ids, "SnapFloatLayoutRight")
+            fl.clear_widgets()
+
             # Get size informatoin 
             (max_x, max_y) = Window.size
             max_x = (max_x/16) * 8 *2 # Allow for wierd aspect ratios
@@ -243,14 +272,15 @@ class CardsScreen(Screen):
             right_card = randint(0,len(cards)-1)
             while left_card == right_card:
                 right_card = randint(0,len(cards))
-
+            
+            oi = App.get_running_app().config.get('main_settings', 'optionsimages')
             # Set left and rright
             self.addCardsToFLayer("SnapFloatLayoutLeft", max_x, max_y, 
-                                  "./images/signs/", 
+                                  "./images/" + oi + "/", 
                                   cards[left_card]
                                   )
             self.addCardsToFLayer("SnapFloatLayoutRight", max_x, max_y, 
-                                  "./images/signs/", 
+                                  "./images/" + oi + "/", 
                                   cards[right_card]
                                   )
                                   
@@ -281,34 +311,30 @@ class CardsScreen(Screen):
             fl.add_widget(rbutton)
     def removeCardsFromFLayer(self):
         total_correct_return = 0
-        fl = getattr(self.ids, "SnapFloatLayoutLeft")
-        fl.clear_widgets()
-        fl = getattr(self.ids, "SnapFloatLayoutRight")
-        fl.clear_widgets()
         self.total_correct = self.total_correct + 1
-        if self.total_correct >= TOTALWIN:
+        if self.total_correct >= int(App.get_running_app().config.get('main_settings', 'totaltowinsolo')):
+            # Done! 
+            #Reset counters
             self.total_correct = 0
             total_correct_return = -1
             self.manager.current = 'notify'
+            self.manager.get_screen('notify').labelText = self.strTotal()
+            self.total_dseconds = 0
         else:
             total_correct_return = self.total_correct
         self.new_set = True
         self.populateCards()
-        print("self.total_correct", self.total_correct)
         return total_correct_return
 
 class NotifyScreen(Screen):
+    labelText = StringProperty('My label')
     colour = ListProperty([1., 0., 0., 1.])
+    time_str = StringProperty('Boo')
+    
 
 class ResultsScreen(Screen):
     labelText = StringProperty('My label')
-    nextS = StringProperty('intro')
-#    def __init__(self, **kwargs):
-#        super(Screen, self).__init__(**kwargs)
-#        self.labelText = StringProperty('My label')
-#        self.next_screen = StringProperty('intro')
-#        self.colour = ListProperty([1., 0., 0., 1.])
-    
+    pass
 
 class MyScreenManager(ScreenManager):
     blue   = ListProperty([0.19, 0.39, 0.78, 1])
@@ -317,7 +343,29 @@ class MyScreenManager(ScreenManager):
 
 class SplendidSnapApp(App):
     def build(self):
+        self.use_kivy_settings = False
+        setting = self.config.get('main_settings', 'totaltowinsolo')
         return Builder.load_file('SplendidSnap.kv')
+
+    def build_config(self, config):
+        config.setdefaults('main_settings', {
+            'totaltowinsolo': 2,
+            'optionsimages': 'signs',
+            'stringexample': 'some_string',
+            'pathexample': '/some/path'})
+
+    def build_settings(self, settings):
+        settings.add_json_panel('Main Settings',
+                                self.config,
+                                data=settings_json)
+
+    def on_config_change(self, config, section,
+                         key, value):
+        #main_settings optionsimages doodle
+        if section == 'main_settings' and key == 'optionsimages':
+            # Horrible syntax!
+            # https://kivy.org/doc/stable/api-kivy.uix.screenmanager.html#kivy.uix.screenmanager.ScreenManager.switch_to
+            self.root.screens[1].new_set = True
 
 
 if __name__ == "__main__":

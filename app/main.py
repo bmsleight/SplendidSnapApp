@@ -22,6 +22,7 @@ from random import random, randint
 import os
 
 from settingsjson import settings_json
+from highscores import HighScores
 
 
 class ClockRect(Widget):
@@ -312,13 +313,24 @@ class CardsScreen(Screen):
     def removeCardsFromFLayer(self):
         total_correct_return = 0
         self.total_correct = self.total_correct + 1
-        if self.total_correct >= int(App.get_running_app().config.get('main_settings', 'totaltowinsolo')):
+        rounds_to_win = int(App.get_running_app().config.get('main_settings', 'totaltowinsolo'))
+        if self.total_correct >= rounds_to_win:
             # Done! 
             #Reset counters
+            self.manager.current = 'notify'
+            #Highscores
+            if rounds_to_win == 10:
+                self.manager.get_screen('notify').labelText = self.strTotal()
+                c = App.get_running_app().config.get('main_settings', 
+                                                     'optionsimages')
+                highscores = HighScores()
+                highscores.newScore(self.total_dseconds, c)
+            else:
+                self.manager.get_screen('notify').labelText = \
+                      self.strTotal() + \
+                      " (need 10 rounds for a high score)"
             self.total_correct = 0
             total_correct_return = -1
-            self.manager.current = 'notify'
-            self.manager.get_screen('notify').labelText = self.strTotal()
             self.total_dseconds = 0
         else:
             total_correct_return = self.total_correct
@@ -336,6 +348,22 @@ class ResultsScreen(Screen):
     labelText = StringProperty('My label')
     pass
 
+
+class HighScoresScreen(Screen):
+    labelText = StringProperty('My label')
+    def __init__(self, **kwargs):
+        super(Screen, self).__init__(**kwargs)
+        self.labelText = 'My labeaal'
+
+#    labelText = StringProperty('My label')
+    def populateHS(self):
+        highscores = HighScores()
+        self.labelText = highscores.__str__()
+        print(self.labelText)
+
+    def clearHS(self):
+        pass
+
 class MyScreenManager(ScreenManager):
     blue   = ListProperty([0.19, 0.39, 0.78, 1])
     orange = ListProperty([1, 0.61, 0, 1])
@@ -349,8 +377,8 @@ class SplendidSnapApp(App):
 
     def build_config(self, config):
         config.setdefaults('main_settings', {
-            'totaltowinsolo': 2,
-            'optionsimages': 'signs',
+            'totaltowinsolo': 10,
+            'optionsimages': 'traffic',
             'stringexample': 'some_string',
             'pathexample': '/some/path'})
 

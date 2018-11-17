@@ -1,0 +1,49 @@
+## traffic
+https://www.gov.uk/guidance/traffic-sign-images#images-in-jpg-format
+
+### doodle
+https://www.smashingmagazine.com/2014/11/free-hand-drawn-doodle-icon-set-100-icons-png-psd-svg/
+
+### Food
+https://www.iconfinder.com/iconsets/food-set-3
+https://iconstore.co/category/food/
+mogrify -format png *.svg
+mogrify *.png
+
+### Flags
+free wikipedia + imagemagik to conver to named
+old project
+
+
+options': ['traffic', 'doodle', 'food', 
+                 'flags', 'hipster', 'monster', 
+                'railway', 'round', 'social']},
+
+### hipster
+https://roundicons.com
+100 Free Flat Icons Vol 2.zip
+mogrify *.png
+
+## monsters
+https://roundicons.com/vector-free-icons/
+mogrify *.png
+
+### Round
+https://roundicons.com
+60 Free Flat Round Icons Set.zip
+
+
+
+## railway
+https://www.rssb.co.uk/rgs/standards/girt7033%20iss%202.pdf
+pdfimages -all girt7033\ iss\ 2.pdf railway/_r
+rm railway/*.jpg
+mogrify -flip railway/*.png 
+rm railway/*000* railway/*030* railway/*042* railway/*057* railway/*113* railway/*125* railway/*126* railway/*129* railway/*134* railway/*137* railway/*139* railway/*-14* railway/*150*
+
+
+### Social
+https://roundicons.com/icon-packs/social-media-filled-outline-icons/
+mogrify -format png *.svg
+#https://bbs.archlinux.org/viewtopic.php?pid=1269845#p1269845
+

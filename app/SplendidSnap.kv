@@ -5,6 +5,7 @@ MyScreenManager:
     CardsScreen:
     NotifyScreen:
     ResultsScreen:
+    HighScoresScreen:
 
 <MenuButton@Button>:
     background_normal: ''
@@ -35,6 +36,10 @@ MyScreenManager:
             BoxLayout:
                 MenuButton:
                     text: 'Start Multi Player Game (Not yet implemented)'
+            BoxLayout:
+                MenuButton:
+                    text: 'High Scores'
+                    on_release: app.root.current = 'high'
             BoxLayout:
                 MenuButton:
                     text: 'Setting'
@@ -97,7 +102,7 @@ MyScreenManager:
             on_release: app.root.current = 'intro'
 
 <ResultsScreen>:
-    name: 'results'
+    name: 'results' 
     BoxLayout:
         canvas:
             Color:
@@ -109,3 +114,27 @@ MyScreenManager:
             font_size: 50
             text: root.labelText
             on_release: root.manager.current = 'cards'
+
+<HighScoresScreen>:
+    name: 'high'
+    on_pre_enter: root.populateHS()
+    on_pre_leave: root.clearHS()
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: root.manager.blue
+            Rectangle:
+                size: self.size
+                pos: self.pos    
+        Label:
+            size_hint: (1, 0.1)
+            font_size: 50
+            color: (1, 0.61, 0, 1)
+            text: "High Scores"
+            on_touch_down: app.root.current = 'intro'
+        MenuButton:
+            text: root.labelText
+            font_size: 50
+            on_release: app.root.current = 'intro'

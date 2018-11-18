@@ -41,4 +41,22 @@ Source of files - https://www.smashingmagazine.com/2014/11/free-hand-drawn-doodl
 ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175036.jpg)
  Source of files, wikipedia + imagemagik to convert to named. (From a old porject)
  
+ ## Round
+ ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-145500.jpg)
  
+ Source of files - https://roundicons.com/icon-packs/free-flat-round-icons-set/
+ 
+ ## Railway
+ 
+ ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175218.jpg)
+ 
+ Source of files - https://www.rssb.co.uk/rgs/standards/girt7033%20iss%202.pdf
+(If I had traffic, I need for balance railways signs)
+
+## Hipster
+
+![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175141.jpg)
+
+Source of files - https://roundicons.com - 100 Free Flat Icons Vol 2.zip
+
+

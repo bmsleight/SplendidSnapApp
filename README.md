@@ -18,6 +18,10 @@ Good Luck!
 
 Ready? Splendid!
 
+
+# Android
+It is not in the Play Store (yet), but you can [install the pre-release version](https://github.com/bmsleight/SplendidSnapApp/tree/master/app/bin)
+
 ## Sets of Cards
 
 The is a splendid selection of sets of cards within the game. Can you spot the matching cards ?

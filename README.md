@@ -24,7 +24,7 @@ It is not in the Play Store (yet), but you can [install the pre-release version]
 
 ## Sets of Cards
 
-The is a splendid selection of sets of cards within the game. Can you spot the matching cards ?
+This is the splendid selection of sets of cards within the game. Can you spot the matching cards ?
 
 ### Social
 ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-144943.jpg)

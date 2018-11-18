@@ -11,7 +11,7 @@ MyScreenManager:
     background_normal: ''
     background_color: (1, 0.61, 0, 1) if self.state == 'normal' else (0.19, 0.39, 0.78, 1) 
     color: (0.19, 0.39, 0.78, 1)
-    font_size: 50
+    font_size: dp(25)
     
 <IntroScreen>:
     name: 'intro'
@@ -92,14 +92,14 @@ MyScreenManager:
                 size: self.size
                 pos: self.pos    
         Label:
-            font_size: 50
+            font_size: dp(25)
             color: (1, 0.61, 0, 1)
             text: root.labelText
-            on_touch_down: app.root.current = 'intro'
+            on_touch_down: app.root.current = 'high'
         MenuButton:
             text: 'Game Completed !'
-            font_size: 50
-            on_release: app.root.current = 'intro'
+            font_size: dp(25)
+            on_release: app.root.current = 'high'
 
 <ResultsScreen>:
     name: 'results' 
@@ -111,7 +111,7 @@ MyScreenManager:
                 size: self.size
                 pos: self.pos            
         MenuButton:
-            font_size: 50
+            font_size: dp(25)
             text: root.labelText
             on_release: root.manager.current = 'cards'
 
@@ -130,11 +130,11 @@ MyScreenManager:
                 pos: self.pos    
         Label:
             size_hint: (1, 0.1)
-            font_size: 50
+            font_size: dp(25)
             color: (1, 0.61, 0, 1)
             text: "High Scores"
             on_touch_down: app.root.current = 'intro'
         MenuButton:
             text: root.labelText
-            font_size: 50
+            sfont_size: dp(25)
             on_release: app.root.current = 'intro'

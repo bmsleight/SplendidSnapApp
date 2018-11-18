@@ -17,6 +17,9 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.widget import Widget
 
+from kivy.uix.settings import Settings
+
+
 import time
 from random import random, randint
 import os
@@ -24,6 +27,7 @@ import os
 from settingsjson import settings_json
 from highscores import HighScores
 from cardarrangement import *
+from settingscrolloptions import SettingScrollOptions
 
 class ClockRect(Widget):
     def __init__(self, **kwargs):
@@ -80,10 +84,22 @@ class IconButton(ToggleButtonBehavior, Image):
                 if total_correct_return == -1:
                     screen.manager.current = 'notify'
                 else:
-                    screen.parent.get_screen('results').labelText = guess_result + " You have made " + str(total_correct_return) + " correct matches"
+                    if total_correct_return == 1:
+                        matches_text = " You have made the first" + \
+                                       " correct match"
+                    else:
+                        matches_text = " You have made " + \
+                                        str(total_correct_return) + \
+                                        " correct matches"
+                    screen.parent.get_screen('results').labelText = \
+                                                        guess_result + \
+                                                        matches_text
+                        
                     screen.manager.current = 'results'
             else:
-                screen.parent.get_screen('results').labelText = guess_result + " Change at least one to a make a match"
+                screen.parent.get_screen('results').labelText = \
+                                                        guess_result + \
+                                " Change at least one to a make a match"
                 screen.manager.current = 'results'
             
 
@@ -265,7 +281,7 @@ class MyScreenManager(ScreenManager):
 class SplendidSnapApp(App):
     def build(self):
         self.use_kivy_settings = False
-        setting = self.config.get('main_settings', 'totaltowinsolo')
+ #       setting = self.config.get('main_settings', 'totaltowinsolo')
         return Builder.load_file('SplendidSnap.kv')
 
     def build_config(self, config):
@@ -276,6 +292,8 @@ class SplendidSnapApp(App):
             'pathexample': '/some/path'})
 
     def build_settings(self, settings):
+        Setting = Settings()
+        settings.register_type('scrolloptions', SettingScrollOptions)        
         settings.add_json_panel('Main Settings',
                                 self.config,
                                 data=settings_json)

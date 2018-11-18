@@ -17,3 +17,28 @@ At the end of your game you will see your score time. Try and set the high score
 Good Luck! 
 
 Ready? Splendid!
+
+## Sets of Cards
+
+The is a splendid selection of sets of cards within the game. Can you spot the matching cards ?
+
+### Social
+![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-144943.jpg)
+
+Source of files - https://roundicons.com/icon-packs/social-media-filled-outline-icons/
+
+### Traffic 
+![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-145115.jpg)
+
+Source of files - https://www.gov.uk/guidance/traffic-sign-images#images-in-jpg-format
+
+### Doodle
+![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-174918.jpg)
+
+Source of files - https://www.smashingmagazine.com/2014/11/free-hand-drawn-doodle-icon-set-100-icons-png-psd-svg/
+
+### Flags
+![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175036.jpg)
+ Source of files, wikipedia + imagemagik to convert to named. (From a old porject)
+ 
+ 

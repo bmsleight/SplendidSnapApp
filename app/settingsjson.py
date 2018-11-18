@@ -9,7 +9,7 @@ settings_json = json.dumps([
      'desc': 'Number of correct matches per solo game',
      'section': 'main_settings',
      'key': 'totaltowinsolo'},
-    {'type': 'options',
+    {'type': 'scrolloptions',
      'title': 'Cards',
      'desc': 'Choose which set of cards',
      'section': 'main_settings',

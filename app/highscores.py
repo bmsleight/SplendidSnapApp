@@ -29,7 +29,7 @@ class HighScores:
     def newScore(self, complete_time_ds, cards, date_str=None):
         s = Score(complete_time_ds, cards, date_str)
         self.scores.append(s)
-        self.scores = sorted(self.scores, reverse=True)[:self.num]
+        self.scores = sorted(self.scores)[:self.num]
         self.save()
     def load(self):
         with open(self.filename, 'rb') as f:
@@ -42,6 +42,7 @@ class HighScores:
         n = 1
         for s in self.scores:
             r = r + str(n) + ". " + s.__str__() + "\n"
+            n = n + 1
         return (r)    
     
 

@@ -6,6 +6,7 @@ MyScreenManager:
     NotifyScreen:
     ResultsScreen:
     HighScoresScreen:
+    HelpScreen:
 
 <MenuButton@Button>:
     background_normal: ''
@@ -31,7 +32,7 @@ MyScreenManager:
             orientation: 'vertical'
             BoxLayout:
                 MenuButton:
-                    text: 'Start Solo Game'
+                    text: 'Start Game'
                     on_release: app.root.current = 'cards'
             BoxLayout:
                 MenuButton:
@@ -42,7 +43,11 @@ MyScreenManager:
                     on_release: app.root.current = 'high'
             BoxLayout:
                 MenuButton:
-                    text: 'Setting'
+                    text: 'Help'
+                    on_release: app.root.current = 'help'
+            BoxLayout:
+                MenuButton:
+                    text: 'Settings'
                     on_release: app.open_settings()
             BoxLayout:
                 MenuButton:
@@ -136,5 +141,89 @@ MyScreenManager:
             on_touch_down: app.root.current = 'intro'
         MenuButton:
             text: root.labelText
-            sfont_size: dp(25)
+            font_size: dp(25)
             on_release: app.root.current = 'intro'
+
+<HelpScreen>:
+    name: 'help'
+    on_pre_enter: root.populate()
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.1)
+            canvas:
+                Color:
+                    rgba: root.manager.orange
+                Rectangle:
+                    size: self.size
+                    pos: self.pos            
+            MenuButton:
+                text: 'Help'
+                font_size: dp(25)
+                on_release: app.root.current = 'intro'
+        BoxLayout:
+            orientation: 'vertical'
+            canvas:
+                Color:
+                    rgba: root.manager.blue
+                Rectangle:
+                    size: self.size
+                    pos: self.pos           
+            BoxLayout:
+                ScrollView:
+                    bar_width: 25
+                    bar_margin: 2
+                    bar_color: (1, 0.61, 0, 1)
+                    bar_inactive_color: (1, 0.61, 0, 1)
+                    Label:
+                        markup: True
+                        font_size: dp(25)
+                        text_size: self.width, None
+                        color: (1, 0.61, 0, 1)
+                        text: root.labelText
+                        halign: 'left'
+                        valign: 'top'            
+                        padding: (30,30)
+                        size_hint_y: None
+                        height: self.texture_size[1]
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: (10,10)
+                canvas:
+                    Color:
+                        rgba: root.manager.orange
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos            
+                BoxLayout:
+                    orientation: 'horizontal'
+                    padding: (10,10)
+                    canvas:
+                        Color:
+                            rgba: root.manager.blue
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos            
+    
+                    Image:
+                        source: 'assets/help/before.jpg'
+                        allow_stretch: True
+                        keep_ratio: True
+                    Image:
+                        source: 'assets/help/after.png'
+                        allow_stretch: True
+                        keep_ratio: True
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.1)
+            canvas:
+                Color:
+                    rgba: root.manager.orange
+                Rectangle:
+                    size: self.size
+                    pos: self.pos            
+            MenuButton:
+                text: 'Return to Menu'
+                font_size: dp(25)
+                on_release: app.root.current = 'intro'

@@ -14,7 +14,7 @@ settings_json = json.dumps([
      'desc': 'Choose which set of cards',
      'section': 'main_settings',
      'key': 'optionsimages',
-     'options': ['traffic', 'doodle', 'food', 
+     'options': ['traffic', 'doodle',  
                  'flags', 'hipster', 'monster', 
                 'railway', 'round', 'social']},
      ])

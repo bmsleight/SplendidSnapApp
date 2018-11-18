@@ -28,6 +28,7 @@ from settingsjson import settings_json
 from highscores import HighScores
 from cardarrangement import *
 from settingscrolloptions import SettingScrollOptions
+from helpscreen import HelpScreen
 
 class ClockRect(Widget):
     def __init__(self, **kwargs):

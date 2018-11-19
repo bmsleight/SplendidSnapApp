@@ -12,7 +12,7 @@ Once you click 'start solo game' a split screen will appear with 8 icons on each
 
 If it is correct you will move to the next challenge. The screen will say 'Success! You have made 1 correct match. Touch this and you will be taken to the next set of icons.
 If it is wrong you will see a failure screen. ''Failure! Change at least one to make a match. Touch the screen and go back and try again.
-At the end of your game you will see your score time. Try and set the high score by completign a round of 10 screens.
+At the end of your game you will see your score time. Try and set the high score by completing a round of 10 screens.
 
 Good Luck! 
 

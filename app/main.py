@@ -107,7 +107,8 @@ class IconButton(ToggleButtonBehavior, Image):
 class SnapArrayButtonClass:
     def __init__(self):
         self.rbuttons = []
-    def newRButton(self, w, h, x, y, size, img_up, card_number, positional_offset=0):
+    def newRButton(self, w, h, x, y, size, img_up, card_number, 
+                   positional_offset=0):
         '''
         Images need to be bigger than canvas, so biggger than rotated button
         ''' 
@@ -184,7 +185,8 @@ class CardsScreen(Screen):
             while left_card == right_card:
                 right_card = randint(0,len(cards))
             
-            oi = App.get_running_app().config.get('main_settings', 'optionsimages')
+            oi = App.get_running_app().config.get('main_settings', 
+                                                  'optionsimages')
             # Set left and rright
             self.addCardsToFLayer("SnapFloatLayoutLeft", max_x, max_y, 
                                   "./images/" + oi + "/", 
@@ -223,13 +225,14 @@ class CardsScreen(Screen):
     def removeCardsFromFLayer(self):
         total_correct_return = 0
         self.total_correct = self.total_correct + 1
-        rounds_to_win = int(App.get_running_app().config.get('main_settings', 'totaltowinsolo'))
-        if self.total_correct >= rounds_to_win:
+        rt_win = int(App.get_running_app().config.get('main_settings', 
+                                                      'totaltowinsolo'))
+        if self.total_correct >= rt_win:
             # Done! 
             #Reset counters
             self.manager.current = 'notify'
             #Highscores
-            if rounds_to_win == 10:
+            if rt_win == 10:
                 self.manager.get_screen('notify').labelText = self.strTotal()
                 c = App.get_running_app().config.get('main_settings', 
                                                      'optionsimages')
@@ -250,7 +253,6 @@ class CardsScreen(Screen):
 
 class NotifyScreen(Screen):
     labelText = StringProperty('My label')
-    colour = ListProperty([1., 0., 0., 1.])
     time_str = StringProperty('Boo')
     
 
@@ -277,13 +279,30 @@ class HighScoresScreen(Screen):
 class MyScreenManager(ScreenManager):
     blue   = ListProperty([0.19, 0.39, 0.78, 1])
     orange = ListProperty([1, 0.61, 0, 1])
+    def go_back(self, screen_name):
+        if screen_name == 'root':
+            exit()
+        else:
+            self.current = 'intro'
 
 
 class SplendidSnapApp(App):
     def build(self):
         self.use_kivy_settings = False
- #       setting = self.config.get('main_settings', 'totaltowinsolo')
+        self.bind(on_start=self.post_build_init)
         return Builder.load_file('SplendidSnap.kv')
+
+    def post_build_init(self, *args):
+        win = Window
+        win.bind(on_keyboard=self.my_key_handler)
+
+    def my_key_handler(self, window, keycode1, keycode2, text, 
+                       modifiers):
+        if keycode1 in [27, 1001]:
+            self.root.go_back(screen_name=self.root.current)
+            return True
+        return False
+
 
     def build_config(self, config):
         config.setdefaults('main_settings', {
@@ -301,11 +320,8 @@ class SplendidSnapApp(App):
 
     def on_config_change(self, config, section,
                          key, value):
-        #main_settings optionsimages doodle
         if section == 'main_settings' and key == 'optionsimages':
-            # Horrible syntax!
-            # https://kivy.org/doc/stable/api-kivy.uix.screenmanager.html#kivy.uix.screenmanager.ScreenManager.switch_to
-            self.root.screens[1].new_set = True
+            self.root.get_screen('cards').new_set = True
 
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@
 MyScreenManager:
     IntroScreen:
     CardsScreen:
+    MultiMenuScreen:
+    StartMultiPlayerGameScreen:
     NotifyScreen:
     ResultsScreen:
     HighScoresScreen:
@@ -32,11 +34,12 @@ MyScreenManager:
             orientation: 'vertical'
             BoxLayout:
                 MenuButton:
-                    text: 'Start Game'
+                    text: 'Start Quick Game'
                     on_release: app.root.current = 'cards'
             BoxLayout:
                 MenuButton:
-                    text: 'Start Multi Player Game (Not yet implemented)'
+                    text: 'Multi-player Menu'
+                    on_release: app.root.current = 'multimenu'
             BoxLayout:
                 MenuButton:
                     text: 'High Scores'
@@ -54,7 +57,39 @@ MyScreenManager:
                     text: 'Quit'
                     on_release: app.stop()
             BoxLayout:
-    
+
+
+<MultiMenuScreen>:
+    name: 'multimenu'
+    id: 'multimenu'
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle: 
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            source: 'assets/logo.png'
+            allow_stretch: True
+            keep_ratio: True
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                MenuButton:
+                    text: 'Start a new mutli-player game'
+                    on_release: app.root.current = 'smpgame'
+            BoxLayout:
+                MenuButton:
+                    text: 'Join a mutli-player game using game code'
+            BoxLayout:
+                MenuButton:
+                    text: 'Return to Main Menu'
+                    on_release: app.root.current = 'intro'
+            BoxLayout:
+
+
 <CardsScreen>:
     name: 'cards'
     id: cards
@@ -98,7 +133,7 @@ MyScreenManager:
                 pos: self.pos    
         Label:
             font_size: dp(25)
-            color: (1, 0.61, 0, 1)
+            color: root.manager.orange
             text: root.labelText
             on_touch_down: app.root.current = 'high'
         MenuButton:
@@ -174,13 +209,13 @@ MyScreenManager:
                 ScrollView:
                     bar_width: 25
                     bar_margin: 2
-                    bar_color: (1, 0.61, 0, 1)
-                    bar_inactive_color: (1, 0.61, 0, 1)
+                    bar_color: root.manager.orange
+                    bar_inactive_color: root.manager.orange
                     Label:
                         markup: True
                         font_size: dp(25)
                         text_size: self.width, None
-                        color: (1, 0.61, 0, 1)
+                        color: root.manager.orange
                         text: root.labelText
                         halign: 'left'
                         valign: 'top'            
@@ -225,5 +260,88 @@ MyScreenManager:
                     pos: self.pos            
             MenuButton:
                 text: 'Return to Menu'
+                font_size: dp(25)
+                on_release: app.root.current = 'intro'
+
+
+<StartMultiPlayerGameScreen>:
+    name: 'smpgame'
+    on_enter: root.on_enter()
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.1)
+            canvas:
+                Color:
+                    rgba: root.manager.orange
+                Rectangle:
+                    size: self.size
+                    pos: self.pos            
+            MenuButton:
+                text: 'Set-up multi-player game'
+                font_size: dp(25)
+#                on_release: app.root.current = 'intro'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.8)
+            canvas:
+                Color:
+                    rgba: root.manager.blue
+                Rectangle:
+                    size: self.size
+                    pos: self.pos           
+            BoxLayout:
+                ScrollView:
+                    bar_width: 25
+                    bar_margin: 2
+                    bar_color: root.manager.orange
+                    bar_inactive_color: root.manager.orange
+                    Label:
+                        markup: True
+                        font_size: dp(25)
+                        text_size: self.width, None
+                        color: root.manager.orange
+                        text: root.server_messages
+                        halign: 'left'
+                        valign: 'top'            
+                        padding: (30,30)
+                        size_hint_y: None
+                        height: self.texture_size[1]
+            BoxLayout:
+                size_hint: (1, 0.25)
+                orientation: 'horizontal'
+                padding: (10,10)
+                canvas:
+                    Color:
+                        rgba: root.manager.orange
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos            
+                BoxLayout:
+                    orientation: 'horizontal'
+                    padding: (10,10)
+                    canvas:
+                        Color:
+                            rgba: root.manager.blue
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos            
+                    Label:
+                        markup: True
+                        font_size: dp(25)
+                        color: root.manager.orange
+                        text: root.game_key_label
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.1)
+            canvas:
+                Color:
+                    rgba: root.manager.orange
+                Rectangle:
+                    size: self.size
+                    pos: self.pos            
+            MenuButton:
+                text: 'Start the game'
                 font_size: dp(25)
                 on_release: app.root.current = 'intro'

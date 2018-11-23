@@ -1,4 +1,8 @@
 
+from kivy.support import install_twisted_reactor
+install_twisted_reactor()
+
+
 from kivy.app import App
 from kivy.base import runTouchApp
 from kivy.clock import Clock
@@ -30,12 +34,19 @@ from cardarrangement import *
 from settingscrolloptions import SettingScrollOptions
 from helpscreen import HelpScreen
 
+# Added Autobahn
+from kivy.factory import Factory
+from autobahn.twisted.wamp import ApplicationSession
+from autobahn.twisted.wamp import ApplicationRunner
+from twisted.internet.defer import inlineCallbacks
+
+
+
 class ClockRect(Widget):
     def __init__(self, **kwargs):
         super(ClockRect, self).__init__(**kwargs)
         self.timer = Clock
         self.dseconds = 0
-#        self.start()
     def start(self):
         self.event = self.timer.schedule_interval(self.update, 1/10.)
     def pause(self):
@@ -61,7 +72,6 @@ class IconButton(ToggleButtonBehavior, Image):
         self.bind(pos=self.update_canvas)
         self.bind(size=self.update_canvas)
         self.guess = None
-#        self.allow_stretch = True
     def update_canvas(self, *args):
         self.rotate.origin = self.center
     def on_state(self, widget, value):
@@ -124,13 +134,7 @@ class SnapArrayButtonClass:
         btn.card_number = card_number
         rbutton.add_widget(btn)
         self.rbuttons.append(rbutton)
-        # Used for debugging, show canvas area
-#        with rbutton.canvas:
-#            Color(random(), random(), random(), 0.24)
-#            Rectangle(pos=(0,0), size=rbutton.size)
         return rbutton
-
-
 
 
 class IntroScreen(Screen):
@@ -143,6 +147,7 @@ class CardsScreen(Screen):
         self.guess = "None"
         self.total_correct = 0
         self.total_dseconds = 0
+        self.remote_set = None
     def newGuess(self, guess):
         if self.guess == "None":
             self.guess = guess
@@ -179,45 +184,56 @@ class CardsScreen(Screen):
             max_x = (max_x/16) * 8 *2 # Allow for wierd aspect ratios
 
             # Get set of cards for left and right
-            cards, num_pictures = simple_card_list(7)
-            left_card = randint(0,len(cards)-1)
-            right_card = randint(0,len(cards)-1)
-            while left_card == right_card:
-                right_card = randint(0,len(cards))
-            
-            oi = App.get_running_app().config.get('main_settings', 
-                                                  'optionsimages')
+            if self.remote_set:
+                pass
+                left_card = self.remote_set.left_card
+                right_card = self.remote_set.left_card
+                oi = self.remote_set.oi
+                use_group_l = self.remote_set.use_group_l
+                use_group_r = self.remote_set.use_group_r
+            else:
+                cards = simple_card_list(7)
+                left_card = randint(0,len(cards)-1)
+                right_card = randint(0,len(cards)-1)
+                while left_card == right_card:
+                    right_card = randint(0,len(cards))
+                oi = App.get_running_app().config.get('main_settings', 
+                                                      'optionsimages')
+                use_group_l = None
+                use_group_r = None
             # Set left and rright
             self.addCardsToFLayer("SnapFloatLayoutLeft", max_x, max_y, 
                                   "./images/" + oi + "/", 
-                                  cards[left_card]
+                                  cards[left_card],
+                                  use_group_l
                                   )
             self.addCardsToFLayer("SnapFloatLayoutRight", max_x, max_y, 
                                   "./images/" + oi + "/", 
-                                  cards[right_card]
+                                  cards[right_card],
+                                  use_group_r
                                   )
-                                  
         self.new_set = False
 
     def addCardsToFLayer(self, layerId, max_x, max_y,
                         img_location,
                         card,
+                        use_group_i,
                         positional_offset=0):
         fl = getattr(self.ids, layerId)        
 
         # Make buttons and get button positions
         rbuttons = SnapArrayButtonClass()
         positions = IconPositionsGroup()
-        randomGroup = positions.randomGroup()
+        use_group = positions.getGroup(use_group_i)
 
          
         images = os.listdir(img_location)
         for i in range(0,8):
             rbutton = rbuttons.newRButton(max_x, 
                                           max_y,
-                                          randomGroup.config[i].x, 
-                                          randomGroup.config[i].y,
-                                          randomGroup.config[i].size,
+                                          use_group.config[i].x, 
+                                          use_group.config[i].y,
+                                          use_group.config[i].size,
                                           img_location + images[card[i]],
                                           card[i]
                                           )
@@ -276,6 +292,93 @@ class HighScoresScreen(Screen):
     def clearHS(self):
         pass
 
+
+class MultiMenuScreen(Screen):
+    pass
+
+
+class GameWampComponent(ApplicationSession):
+    """
+    A WAMP application component which is run from the Kivy UI.
+    """
+
+    def onJoin(self, details):
+        print("session ready", self.config.extra)
+
+        # get the Kivy UI component this session was started from
+        ui = self.config.extra['ui']
+        print(ui)
+        ui.on_session(self)
+        print("Join")
+
+        # subscribe to WAMP PubSub events and call the Kivy UI component's
+        # function when such an event is received
+        self.subscribe(ui.on_reset_message, u'org.splendidsnap.app.game.reset')
+
+
+class StartMultiPlayerGameScreen(Screen):
+    server_messages = StringProperty('Contacting server ...')
+    game_key_label = StringProperty('Game Key: 123456')
+    def __init__(self, **kwargs):
+        super(Screen, self).__init__(**kwargs)
+#        self.labelText = 'My labeaal'
+        self.session = None
+        self.game_key_label = "Game Key: Waiting"
+        self.server_messages = "Contacting server ..."
+        self.game_key = None
+        self.timer = Clock
+        self.trying_to_connect = False
+
+    def on_enter(self):
+        self.event = self.timer.schedule_interval(self.tick,1.)
+        if self.game_key:
+            pass
+        else:
+            self.getNewGameKey()
+        if self.session:
+            pass
+        else:
+            self.connectToGame()
+
+    def tick(self, *args):
+        if self.session:
+            return False
+        else:
+            self.server_messages += "."
+        
+
+
+    def getNewGameKey(self):
+        game_key = randint(100000, 999999)
+        self.game_key = game_key
+        self.game_key_label = "Game Key: " + str(game_key)
+        return game_key
+
+    def connectToGame(self):
+        if self.session:
+            pass
+        else:
+            if self.trying_to_connect:
+                pass
+            else:
+                self.trying_to_connect = True
+                url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
+#                url, realm = u"ws://localhost:8080/ws", u"crossbardemo"
+                runner = ApplicationRunner(url=url,
+                                           realm=realm,
+                                           extra=dict(ui=self))
+                runner.run(GameWampComponent, start_reactor=False)
+
+
+
+    @inlineCallbacks
+    def on_session(self, session):
+        self.server_messages += "\n Connected to server!"
+        self.session = session
+        self.trying_to_connect = False
+
+
+
 class MyScreenManager(ScreenManager):
     blue   = ListProperty([0.19, 0.39, 0.78, 1])
     orange = ListProperty([1, 0.61, 0, 1])
@@ -290,12 +393,15 @@ class SplendidSnapApp(App):
     def build(self):
         self.use_kivy_settings = False
         self.bind(on_start=self.post_build_init)
+
+#        self.start_wamp_component()
+
         return Builder.load_file('SplendidSnap.kv')
 
     def post_build_init(self, *args):
         win = Window
         win.bind(on_keyboard=self.my_key_handler)
-
+        
     def my_key_handler(self, window, keycode1, keycode2, text, 
                        modifiers):
         if keycode1 in [27, 1001]:
@@ -307,9 +413,7 @@ class SplendidSnapApp(App):
     def build_config(self, config):
         config.setdefaults('main_settings', {
             'totaltowinsolo': 10,
-            'optionsimages': 'traffic',
-            'stringexample': 'some_string',
-            'pathexample': '/some/path'})
+            'optionsimages': 'doodle'})
 
     def build_settings(self, settings):
         Setting = Settings()
@@ -322,7 +426,6 @@ class SplendidSnapApp(App):
                          key, value):
         if section == 'main_settings' and key == 'optionsimages':
             self.root.get_screen('cards').new_set = True
-
 
 if __name__ == "__main__":
     SplendidSnapApp().run()

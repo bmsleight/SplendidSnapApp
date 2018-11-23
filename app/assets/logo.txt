@@ -1,3 +1,4 @@
 Logo : logomakr.com/5H5lm1
 convert logo.png -trim  -bordercolor transparent -border 20 logot2.png
 convert logo.png   -background "#ff9b00"  -fill "#3064c7"   -pointsize 36 caption:'Loading'  -gravity Center -append  logo_loading.png
+convert logo.png   -background "#ff9b00"  -fill "#3064c7" -size 540x    -pointsize 36 caption:"You won't think there's a match... but there always will be!"  -gravity Center -append  -background white -flatten logo_match.png

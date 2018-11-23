@@ -45,8 +45,11 @@ class IconPositionsGroup:
         self.group.append(iconPositions)
     def groups(self):
         return self.group
-    def randomGroup(self):
-        i = randint(0,len(self.group)-1)
+    def getGroup(self, i=None):
+        if i:
+            pass
+        else:
+            i = randint(0,len(self.group)-1)
         print("Group: ", i)
         print("Arrangement: ", self.group[i])
         return self.group[i]
@@ -150,4 +153,4 @@ def simple_card_list(p):
     for i in range(p+1):
         pictures.append(p * p + i)
     cards.append(pictures)
-    return cards, p * p + p +1
+    return cards

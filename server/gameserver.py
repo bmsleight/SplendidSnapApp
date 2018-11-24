@@ -46,29 +46,6 @@ class GamesBackend(ApplicationSession):
     def getNewGame(self, game_key):
         print("New game: ", game_key)
 
-    @wamp.register(u'org.splendidsnap.app.game.demo.vote.get')
-    def getVotes(self):
-        return [{'subject': key, 'votes': value} for key, value in self._votes.items()]
-
-
-    @wamp.register(u'org.splendidsnap.app.game.demo.vote.apples.vote')
-    def submitVote(self, subject):
-        self._apples += 1
-        self.publish(u'org.splendidsnap.app.game.demo.vote.apples.onvote', self._apples)
-        return result
-
-
-    @wamp.register(u'org.splendidsnap.app.game.demo.vote.vote')
-    def submitVote(self, subject):
-        self._votes[subject] += 1
-        result = {'subject': subject, 'votes': self._votes[subject]}
-        self.publish(u'org.splendidsnap.app.game.demo.vote.onvote', result)
-        return result
-
-    @wamp.register(u'org.splendidsnap.app.game.demo.vote.reset')
-    def resetVotes(self):
-        self.init()
-        self.publish(u'org.splendidsnap.app.game.demo.vote.onreset')
 
 
     @inlineCallbacks

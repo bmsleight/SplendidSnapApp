@@ -5,6 +5,7 @@ MyScreenManager:
     CardsScreen:
     MultiMenuScreen:
     StartMultiPlayerGameScreen:
+    JoinMultiPlayerGameScreen:
     NotifyScreen:
     ResultsScreen:
     HighScoresScreen:
@@ -83,6 +84,7 @@ MyScreenManager:
             BoxLayout:
                 MenuButton:
                     text: 'Join a mutli-player game using game code'
+                    on_release: app.root.current = 'jmpgame'
             BoxLayout:
                 MenuButton:
                     text: 'Return to Main Menu'
@@ -345,3 +347,48 @@ MyScreenManager:
                 text: 'Start the game'
                 font_size: dp(25)
                 on_release: app.root.current = 'intro'
+
+
+<JoinMultiPlayerGameScreen>:
+    name: 'jmpgame'
+    game_key_text: txt.text
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: root.manager.blue
+            Rectangle:
+                size: self.size
+                pos: self.pos    
+        Label:
+            size_hint: (1, 0.45)
+            font_size: dp(25)
+            color: root.manager.orange
+            text: "Join Multi-player game"
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (1, 0.1)
+            BoxLayout:
+            Label:
+                font_size: dp(25)
+                color: root.manager.orange
+                text: "Game Key :"
+            TextInput:
+                id: txt
+                input_type: 'number'
+                input_filter: 'int'
+                font_size: dp(25)
+                text: root.game_key_text
+                hint_text: '654321'
+                multiline: False
+                padding: (10,10)
+
+            Button:
+                text: 'Join'
+                font_size: dp(25)
+                on_press: root.joinGameKey()
+
+            BoxLayout:
+        BoxLayout:
+            size_hint: (1, 0.45)
+    

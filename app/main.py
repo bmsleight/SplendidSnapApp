@@ -297,6 +297,19 @@ class MultiMenuScreen(Screen):
     pass
 
 
+class JoinMultiPlayerGameScreen(Screen):
+    game_key_text = StringProperty()
+    def __init__(self, **kwargs):
+        super(JoinMultiPlayerGameScreen, self).__init__(**kwargs)
+        self.game_key_text = '123456'
+
+    def joinGameKey(self):
+        print(self.game_key_text)
+        print(App.get_running_app().root.get_screen('smpgame').game_key )
+        App.get_running_app().root.get_screen('smpgame').game_key = str(self.game_key_text)
+        print("Swicth to 'smpgame'")
+        App.get_running_app().root.current = 'smpgame'
+
 class GameWampComponent(ApplicationSession):
     """
     A WAMP application component which is run from the Kivy UI.
@@ -308,27 +321,31 @@ class GameWampComponent(ApplicationSession):
         # get the Kivy UI component this session was started from
         ui = self.config.extra['ui']
         print(ui)
+        print("Ready to sub....")
+        print("Game key", self.config.extra['game_key'])
+
         ui.on_session(self)
-        print("Join")
 
-        # subscribe to WAMP PubSub events and call the Kivy UI component's
-        # function when such an event is received
-        self.subscribe(ui.on_reset_message, u'org.splendidsnap.app.game.reset')
-        self.subscribe(ui.on_reset_message, u'org.splendidsnap.app.game.newplayer')
-
+        sub_game_joined = u'org.splendidsnap.app.game.joined.'+ \
+                                  str(self.config.extra['game_key'])
+        print("Subscribe to", sub_game_joined)
+        self.subscribe(ui.on_join_message, sub_game_joined)
+        print("sub ok yes")
+        print("Subs done")
 
 class StartMultiPlayerGameScreen(Screen):
     server_messages = StringProperty('Contacting server ...')
     game_key_label = StringProperty('Game Key: 123456')
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
-#        self.labelText = 'My labeaal'
         self.session = None
         self.game_key_label = "Game Key: Waiting"
         self.server_messages = ""
         self.game_key = None
         self.timer = Clock
         self.trying_to_connect = False
+        self.new_game = False
+
 
     def on_enter(self):
         self.event = self.timer.schedule_interval(self.tick,1.)
@@ -351,7 +368,7 @@ class StartMultiPlayerGameScreen(Screen):
         game_key = randint(100000, 999999)
         self.game_key = game_key
         self.game_key_label = "Game Key: " + str(game_key)
-        return game_key
+        self.new_game = True
 
     def connectToGame(self):
         if self.session:
@@ -363,20 +380,40 @@ class StartMultiPlayerGameScreen(Screen):
                 self.trying_to_connect = True
                 self.server_messages += "Contacting server ... "
                 url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
-#                url, realm = u"ws://localhost:8080/ws", u"crossbardemo"
                 self.server_messages += url 
                 runner = ApplicationRunner(url=url,
                                            realm=realm,
-                                           extra=dict(ui=self))
+                                           extra=dict(ui=self, 
+                                                      game_key=self.game_key))
                 runner.run(GameWampComponent, start_reactor=False)
+
+
+    def on_join_message(self, player_name):
+        self.server_messages += " " + player_name + " joined \n"
+        print("on_join_message")
+
 
     @inlineCallbacks
     def on_session(self, session):
         self.server_messages += " Connected to server!"
         self.session = session
         self.trying_to_connect = False
-        self.session.call(u'org.splendidsnap.app.game.newgame', self.game_key)
-        self.server_messages += "\nWainting for more players."
+        p_name = App.get_running_app().config.get('main_settings', 
+                                                  'playername')
+        if self.new_game:
+            rounds = App.get_running_app().config.get('main_settings', 
+                                                  'totaltowinsolo')
+            oi = App.get_running_app().config.get('main_settings', 
+                                                  'optionsimages')                                                  
+            yield self.session.call(u'org.splendidsnap.app.game.newgame', 
+                              self.game_key, rounds, oi, p_name)
+        else:
+            pass
+            # join exisiting game            
+            yield self.session.call(u'org.splendidsnap.app.game.joingame',
+                              self.game_key, p_name)
+
+        self.server_messages += "\nWaiting for more players."
 
 
 
@@ -394,9 +431,6 @@ class SplendidSnapApp(App):
     def build(self):
         self.use_kivy_settings = False
         self.bind(on_start=self.post_build_init)
-
-#        self.start_wamp_component()
-
         return Builder.load_file('SplendidSnap.kv')
 
     def post_build_init(self, *args):

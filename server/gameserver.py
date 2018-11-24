@@ -31,6 +31,27 @@ from twisted.internet.defer import inlineCallbacks
 from autobahn import wamp
 from autobahn.twisted.wamp import ApplicationSession
 
+class MultiplayerGameOptions:
+    def __init__(self, game_key, rounds, optionsimages):
+        self.game_key = game_key
+        self.rounds = rounds
+        self.optionsimages = optionsimages
+        self.players = []
+
+class MultiplayerGames:
+    def __init__(self):
+        self.games = []
+    def addGame(self, game):
+        self.games.append(game)
+    def joinGame(self, game_key, player_name):
+        return_g = None
+        for g in self.games:
+            print("Got ", game_key, type(game_key), " looking for ", 
+                  g.game_key, type(g.game_key))
+            if g.game_key == game_key:
+                return_g = g
+                break
+        return return_g
 
 
 class GamesBackend(ApplicationSession):
@@ -38,13 +59,31 @@ class GamesBackend(ApplicationSession):
     def __init__(self, config):
         ApplicationSession.__init__(self, config)
         self.init()
+        self.games = MultiplayerGames()
+        
 
     def init(self):
         pass
 
     @wamp.register(u'org.splendidsnap.app.game.newgame')
-    def getNewGame(self, game_key):
-        print("New game: ", game_key)
+    def getNewGame(self, game_key, rounds, optionsimages, player_name):
+        game = MultiplayerGameOptions(game_key, rounds, optionsimages)
+        game.players.append(player_name)
+        self.games.addGame(game)
+        print(game_key, rounds, optionsimages, player_name)
+
+    @wamp.register(u'org.splendidsnap.app.game.joingame')
+    def getJoinGame(self, game_key, player_name):
+        game = self.games.joinGame(int(game_key), player_name)
+        if game:
+            publish_game_joined = u'org.splendidsnap.app.game.joined.'+\
+                                  str(game_key)
+            print("Publish to", publish_game_joined)
+            self.publish(publish_game_joined, player_name)
+            print("Joined :", game_key, player_name)
+        else:
+            print("Game key not valid") 
+
 
 
 

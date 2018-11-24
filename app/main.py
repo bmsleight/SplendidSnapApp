@@ -414,7 +414,9 @@ class SplendidSnapApp(App):
     def build_config(self, config):
         config.setdefaults('main_settings', {
             'totaltowinsolo': 10,
-            'optionsimages': 'doodle'})
+            'optionsimages': 'doodle',
+            'playername': "Player_" + str(randint(100000, 999999))
+            })
 
     def build_settings(self, settings):
         Setting = Settings()

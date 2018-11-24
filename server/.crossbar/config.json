@@ -11,7 +11,7 @@
             },
             "realms": [
                 {
-                    "name": "SpledidSnapApp",
+                    "name": "crossbardemo",
                     "roles": [
                         {
                             "name": "anonymous",
@@ -65,7 +65,7 @@
                 {
                     "type": "class",
                     "classname": "gameserver.GamesBackend",
-                    "realm": "SpledidSnapApp",
+                    "realm": "crossbardemo",
                     "role": "anonymous"
                 }
             ]

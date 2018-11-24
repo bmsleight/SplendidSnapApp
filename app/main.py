@@ -314,6 +314,7 @@ class GameWampComponent(ApplicationSession):
         # subscribe to WAMP PubSub events and call the Kivy UI component's
         # function when such an event is received
         self.subscribe(ui.on_reset_message, u'org.splendidsnap.app.game.reset')
+        self.subscribe(ui.on_reset_message, u'org.splendidsnap.app.game.newplayer')
 
 
 class StartMultiPlayerGameScreen(Screen):
@@ -324,7 +325,7 @@ class StartMultiPlayerGameScreen(Screen):
 #        self.labelText = 'My labeaal'
         self.session = None
         self.game_key_label = "Game Key: Waiting"
-        self.server_messages = "Contacting server ..."
+        self.server_messages = ""
         self.game_key = None
         self.timer = Clock
         self.trying_to_connect = False
@@ -345,8 +346,6 @@ class StartMultiPlayerGameScreen(Screen):
             return False
         else:
             self.server_messages += "."
-        
-
 
     def getNewGameKey(self):
         game_key = randint(100000, 999999)
@@ -362,20 +361,22 @@ class StartMultiPlayerGameScreen(Screen):
                 pass
             else:
                 self.trying_to_connect = True
+                self.server_messages += "Contacting server ... "
                 url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
 #                url, realm = u"ws://localhost:8080/ws", u"crossbardemo"
+                self.server_messages += url 
                 runner = ApplicationRunner(url=url,
                                            realm=realm,
                                            extra=dict(ui=self))
                 runner.run(GameWampComponent, start_reactor=False)
 
-
-
     @inlineCallbacks
     def on_session(self, session):
-        self.server_messages += "\n Connected to server!"
+        self.server_messages += " Connected to server!"
         self.session = session
         self.trying_to_connect = False
+        self.session.call(u'org.splendidsnap.app.game.newgame', self.game_key)
+        self.server_messages += "\nWainting for more players."
 
 
 

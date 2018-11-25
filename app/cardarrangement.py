@@ -41,6 +41,8 @@ class IconPositionsGroup:
     def __init__(self):
         self.group = []
         self.populate()
+    def possiblePositions(self):
+        return len(self.group)
     def newGroup(self, iconPositions):
         self.group.append(iconPositions)
     def groups(self):

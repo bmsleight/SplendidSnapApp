@@ -147,7 +147,7 @@ class CardsScreen(Screen):
         self.guess = "None"
         self.total_correct = 0
         self.total_dseconds = 0
-        self.remote_set = None
+        self.remote_set = {}
     def newGuess(self, guess):
         if self.guess == "None":
             self.guess = guess
@@ -184,19 +184,18 @@ class CardsScreen(Screen):
             max_x = (max_x/16) * 8 *2 # Allow for wierd aspect ratios
 
             # Get set of cards for left and right
+            cards = simple_card_list(7)
             if self.remote_set:
-                pass
-                left_card = self.remote_set.left_card
-                right_card = self.remote_set.left_card
-                oi = self.remote_set.oi
-                use_group_l = self.remote_set.use_group_l
-                use_group_r = self.remote_set.use_group_r
+                left_card = self.remote_set['left_card']
+                right_card = self.remote_set['right_card']
+                oi = self.remote_set['oi']
+                use_group_l = self.remote_set['use_group_l']
+                use_group_r = self.remote_set['use_group_r']
             else:
-                cards = simple_card_list(7)
                 left_card = randint(0,len(cards)-1)
                 right_card = randint(0,len(cards)-1)
                 while left_card == right_card:
-                    right_card = randint(0,len(cards))
+                    right_card = randint(0,len(cards)-1)
                 oi = App.get_running_app().config.get('main_settings', 
                                                       'optionsimages')
                 use_group_l = None
@@ -207,6 +206,7 @@ class CardsScreen(Screen):
                                   cards[left_card],
                                   use_group_l
                                   )
+            
             self.addCardsToFLayer("SnapFloatLayoutRight", max_x, max_y, 
                                   "./images/" + oi + "/", 
                                   cards[right_card],
@@ -219,7 +219,14 @@ class CardsScreen(Screen):
                         card,
                         use_group_i,
                         positional_offset=0):
-        fl = getattr(self.ids, layerId)        
+        fl = getattr(self.ids, layerId)
+        
+        print(layerId, max_x, max_y,
+                        img_location,
+                        card,
+                        use_group_i,
+                        positional_offset)
+        # End Debug
 
         # Make buttons and get button positions
         rbuttons = SnapArrayButtonClass()
@@ -310,10 +317,15 @@ class JoinMultiPlayerGameScreen(Screen):
         print("Swicth to 'smpgame'")
         App.get_running_app().root.current = 'smpgame'
 
+
 class GameWampComponent(ApplicationSession):
     """
     A WAMP application component which is run from the Kivy UI.
     """
+    def subto(self, uicallback, short_url, game_key):
+        sub_url = short_url + str(game_key)
+        print("Subscribe to: ", sub_url)
+        self.subscribe(uicallback, sub_url)
 
     def onJoin(self, details):
         print("session ready", self.config.extra)
@@ -325,17 +337,19 @@ class GameWampComponent(ApplicationSession):
         print("Game key", self.config.extra['game_key'])
 
         ui.on_session(self)
-
-        sub_game_joined = u'org.splendidsnap.app.game.joined.'+ \
-                                  str(self.config.extra['game_key'])
-        print("Subscribe to", sub_game_joined)
-        self.subscribe(ui.on_join_message, sub_game_joined)
- 
-        publish_game_start = u'org.splendidsnap.app.game.start.'+\
-                                  str(self.config.extra['game_key'])
-        print("Subscribe to", publish_game_start)
-        self.subscribe(ui.on_start_message, publish_game_start)
-
+        
+        self.subto(ui.on_join_message, 
+                   u'org.splendidsnap.app.game.joined.',
+                   self.config.extra['game_key']
+                   )
+        self.subto(ui.on_start_message, 
+                   u'org.splendidsnap.app.game.start.',
+                   self.config.extra['game_key']
+                   )
+        self.subto(ui.on_card_message, 
+                   u'org.splendidsnap.app.game.card.',
+                   self.config.extra['game_key']
+                   )
         print("Subs done")
 
 class StartMultiPlayerGameScreen(Screen):
@@ -374,10 +388,22 @@ class StartMultiPlayerGameScreen(Screen):
         print("session.call(u'org.splendidsnap.app.game.startpush'")
         self.session.call(u'org.splendidsnap.app.game.startpush', 
                           self.game_key)
+        self.session.call(u'org.splendidsnap.app.game.cardpush', 
+                          self.game_key)
 
     def on_start_message(self):
         print("I am starting .....")
+        print(self.manager)
+        print(dir(self.manager))
 
+    def on_card_message(self, remote_set):
+        
+        print("remote_set ", remote_set)
+        self.manager.get_screen('cards').remote_set = remote_set
+        self.manager.get_screen('cards').new_set = True
+        
+        self.manager.current = 'cards'        
+        #self.manager.current = 'notify'
 
     def getNewGameKey(self):
         game_key = randint(100000, 999999)

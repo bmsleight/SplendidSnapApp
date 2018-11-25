@@ -31,12 +31,16 @@ from twisted.internet.defer import inlineCallbacks
 from autobahn import wamp
 from autobahn.twisted.wamp import ApplicationSession
 
+import time
+
 class MultiplayerGameOptions:
     def __init__(self, game_key, rounds, optionsimages):
         self.game_key = game_key
         self.rounds = rounds
         self.optionsimages = optionsimages
         self.players = []
+        self.start = False
+        self.current_round = 0
 
 class MultiplayerGames:
     def __init__(self):
@@ -46,12 +50,19 @@ class MultiplayerGames:
     def joinGame(self, game_key, player_name):
         return_g = None
         for g in self.games:
-            print("Got ", game_key, type(game_key), " looking for ", 
-                  g.game_key, type(g.game_key))
             if g.game_key == game_key:
                 return_g = g
+                g.players.append(player_name)
                 break
         return return_g
+    def startGame(self, game_key):
+        return_sg = False
+        for g in self.games:
+            if int(g.game_key) == int(game_key):
+                g.start =  True
+                return_sg = True
+                break
+        return return_sg
 
 
 class GamesBackend(ApplicationSession):
@@ -84,7 +95,17 @@ class GamesBackend(ApplicationSession):
         else:
             print("Game key not valid") 
 
-
+    @wamp.register(u'org.splendidsnap.app.game.startpush')
+    def pushStartGame(self, game_key):
+        game = self.games.startGame(int(game_key))
+        if game:
+            publish_game_start = u'org.splendidsnap.app.game.start.'+\
+                                  str(game_key)
+            print("Publish to", publish_game_start)
+            self.publish(publish_game_start)
+            print("start :", game_key)
+        else:
+            print("Game key not valid") 
 
 
     @inlineCallbacks

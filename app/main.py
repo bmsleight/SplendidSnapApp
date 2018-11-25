@@ -330,22 +330,28 @@ class GameWampComponent(ApplicationSession):
                                   str(self.config.extra['game_key'])
         print("Subscribe to", sub_game_joined)
         self.subscribe(ui.on_join_message, sub_game_joined)
-        print("sub ok yes")
+ 
+        publish_game_start = u'org.splendidsnap.app.game.start.'+\
+                                  str(self.config.extra['game_key'])
+        print("Subscribe to", publish_game_start)
+        self.subscribe(ui.on_start_message, publish_game_start)
+
         print("Subs done")
 
 class StartMultiPlayerGameScreen(Screen):
     server_messages = StringProperty('Contacting server ...')
     game_key_label = StringProperty('Game Key: 123456')
+    button_txt = StringProperty('')
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
         self.session = None
         self.game_key_label = "Game Key: Waiting"
         self.server_messages = ""
+        self.button_txt = ""
         self.game_key = None
         self.timer = Clock
         self.trying_to_connect = False
         self.new_game = False
-
 
     def on_enter(self):
         self.event = self.timer.schedule_interval(self.tick,1.)
@@ -363,6 +369,15 @@ class StartMultiPlayerGameScreen(Screen):
             return False
         else:
             self.server_messages += "."
+
+    def startGame(self, *args):
+        print("session.call(u'org.splendidsnap.app.game.startpush'")
+        self.session.call(u'org.splendidsnap.app.game.startpush', 
+                          self.game_key)
+
+    def on_start_message(self):
+        print("I am starting .....")
+
 
     def getNewGameKey(self):
         game_key = randint(100000, 999999)
@@ -407,13 +422,19 @@ class StartMultiPlayerGameScreen(Screen):
                                                   'optionsimages')                                                  
             yield self.session.call(u'org.splendidsnap.app.game.newgame', 
                               self.game_key, rounds, oi, p_name)
+            self.button_txt = "Start Game with Current Players"
+            self.ids['nextbutton'].disabled = False
+            self.ids['nextbutton'].bind(on_press=self.startGame)
+
         else:
-            pass
             # join exisiting game            
             yield self.session.call(u'org.splendidsnap.app.game.joingame',
                               self.game_key, p_name)
+            self.button_txt = "Waiting for game to start"
+            self.ids['nextbutton'].disabled = True
+            self.game_key_label = "Game Key: " + str(self.game_key)
 
-        self.server_messages += "\nWaiting for more players."
+        self.server_messages += "\nWaiting for more players.\n"
 
 
 

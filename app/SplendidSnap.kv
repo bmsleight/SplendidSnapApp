@@ -344,9 +344,10 @@ MyScreenManager:
                     size: self.size
                     pos: self.pos            
             MenuButton:
-                text: 'Start the game'
+                id: nextbutton
+                text: root.button_txt
                 font_size: dp(25)
-                on_release: app.root.current = 'intro'
+                disabled: True
 
 
 <JoinMultiPlayerGameScreen>:

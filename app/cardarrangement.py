@@ -52,8 +52,8 @@ class IconPositionsGroup:
             pass
         else:
             i = randint(0,len(self.group)-1)
-        print("Group: ", i)
-        print("Arrangement: ", self.group[i])
+#        print("Group: ", i)
+#        print("Arrangement: ", self.group[i])
         return self.group[i]
     def populate(self):
         p = IconPositions()

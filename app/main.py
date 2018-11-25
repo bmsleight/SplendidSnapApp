@@ -27,6 +27,9 @@ from kivy.uix.settings import Settings
 import time
 from random import random, randint
 import os
+from time import sleep
+import threading
+
 
 from settingsjson import settings_json
 from highscores import HighScores
@@ -57,6 +60,7 @@ class ClockRect(Widget):
     def update(self, *args):
         self.dseconds = self.dseconds + 1
 
+
 class SnapRelativeLayout(RelativeLayout):
     def __init__(self, **kwargs):
         super(FloatLayout, self).__init__(**kwargs)
@@ -79,6 +83,7 @@ class IconButton(ToggleButtonBehavior, Image):
         #  self.parent.parent.parent ?
         # Tied too much into how kv is...
         screen = self.parent.parent.parent.parent.parent
+        
         if value == 'down':
             self.source = "./assets/logo.png"
             guess_result = screen.newGuess(self.card_number)
@@ -91,22 +96,31 @@ class IconButton(ToggleButtonBehavior, Image):
             pass
         else:
             if guess_result == "Success!":
+                remote_set = screen.manager.get_screen('cards').remote_set
                 total_correct_return = screen.removeCardsFromFLayer()
-                if total_correct_return == -1:
-                    screen.manager.current = 'notify'
+                if remote_set:
+                    # Remote call
+                    screen.manager.get_screen('results').ids['button'].disabled = True
+                    screen.parent.get_screen('results').labelText = "Winner!"
+                    screen.manager.get_screen('smpgame').multiMatch()
                 else:
-                    if total_correct_return == 1:
-                        matches_text = " You have made the first" + \
-                                       " correct match"
+                    # Local sucess
+                    if total_correct_return == -1:
+                        # Finished game - i.e. at 10 correct
+                        screen.manager.current = 'notify'
                     else:
-                        matches_text = " You have made " + \
-                                        str(total_correct_return) + \
-                                        " correct matches"
-                    screen.parent.get_screen('results').labelText = \
-                                                        guess_result + \
-                                                        matches_text
-                        
-                    screen.manager.current = 'results'
+                        if total_correct_return == 1:
+                            matches_text = " You have made the first" + \
+                                           " correct match"
+                        else:
+                            matches_text = " You have made " + \
+                                            str(total_correct_return) + \
+                                            " correct matches"
+                        screen.parent.get_screen('results').labelText = \
+                                                            guess_result + \
+                                                            matches_text
+                            
+                        screen.manager.current = 'results'
             else:
                 screen.parent.get_screen('results').labelText = \
                                                         guess_result + \
@@ -168,7 +182,6 @@ class CardsScreen(Screen):
     def clockStop(self):
         clock = getattr(self.ids, "clock")
         self.total_dseconds = self.total_dseconds + clock.pause()
-        print(self.total_dseconds)
     def strTotal(self):
         return "Total time: " + str(self.total_dseconds/10.) + "s"
     def populateCards(self):
@@ -220,13 +233,6 @@ class CardsScreen(Screen):
                         use_group_i,
                         positional_offset=0):
         fl = getattr(self.ids, layerId)
-        
-        print(layerId, max_x, max_y,
-                        img_location,
-                        card,
-                        use_group_i,
-                        positional_offset)
-        # End Debug
 
         # Make buttons and get button positions
         rbuttons = SnapArrayButtonClass()
@@ -289,13 +295,9 @@ class HighScoresScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
         self.labelText = 'My labeaal'
-
-#    labelText = StringProperty('My label')
     def populateHS(self):
         highscores = HighScores()
         self.labelText = highscores.__str__()
-        print(self.labelText)
-
     def clearHS(self):
         pass
 
@@ -314,7 +316,6 @@ class JoinMultiPlayerGameScreen(Screen):
         print(self.game_key_text)
         print(App.get_running_app().root.get_screen('smpgame').game_key )
         App.get_running_app().root.get_screen('smpgame').game_key = str(self.game_key_text)
-        print("Swicth to 'smpgame'")
         App.get_running_app().root.current = 'smpgame'
 
 
@@ -332,12 +333,7 @@ class GameWampComponent(ApplicationSession):
 
         # get the Kivy UI component this session was started from
         ui = self.config.extra['ui']
-        print(ui)
-        print("Ready to sub....")
-        print("Game key", self.config.extra['game_key'])
-
         ui.on_session(self)
-        
         self.subto(ui.on_join_message, 
                    u'org.splendidsnap.app.game.joined.',
                    self.config.extra['game_key']
@@ -348,6 +344,10 @@ class GameWampComponent(ApplicationSession):
                    )
         self.subto(ui.on_card_message, 
                    u'org.splendidsnap.app.game.card.',
+                   self.config.extra['game_key']
+                   )
+        self.subto(ui.on_winner_message,
+                   u'org.splendidsnap.app.game.winner.',
                    self.config.extra['game_key']
                    )
         print("Subs done")
@@ -366,6 +366,8 @@ class StartMultiPlayerGameScreen(Screen):
         self.timer = Clock
         self.trying_to_connect = False
         self.new_game = False
+        self.p_name = ""
+        self.winner = False
 
     def on_enter(self):
         self.event = self.timer.schedule_interval(self.tick,1.)
@@ -385,25 +387,45 @@ class StartMultiPlayerGameScreen(Screen):
             self.server_messages += "."
 
     def startGame(self, *args):
-        print("session.call(u'org.splendidsnap.app.game.startpush'")
         self.session.call(u'org.splendidsnap.app.game.startpush', 
                           self.game_key)
         self.session.call(u'org.splendidsnap.app.game.cardpush', 
                           self.game_key)
 
+    def delayNewCard(self):
+        sleep(5)
+        self.winner = False
+        self.manager.get_screen('results').ids['button'].disabled = False
+        if self.session:
+            self.session.call(u'org.splendidsnap.app.game.cardpush', 
+                          self.game_key)
+
+    def multiMatch(self):
+        details = {}
+        details['game_key'] = self.game_key
+        details['player_name'] = self.p_name
+        if self.session:
+            self.session.call(u'org.splendidsnap.app.game.matchpush', 
+                          details)
+        self.winner = True
+        # What a headache! - Buy the the GUI update!
+        threading.Thread(target = self.delayNewCard).start()
+        
     def on_start_message(self):
         print("I am starting .....")
-        print(self.manager)
-        print(dir(self.manager))
 
     def on_card_message(self, remote_set):
-        
         print("remote_set ", remote_set)
         self.manager.get_screen('cards').remote_set = remote_set
-        self.manager.get_screen('cards').new_set = True
-        
-        self.manager.current = 'cards'        
-        #self.manager.current = 'notify'
+        self.manager.get_screen('cards').new_set = True        
+        self.manager.current = 'cards'
+
+    def on_winner_message(self, details):
+        self.manager.get_screen('results').ids['button'].disabled = True
+        if not self.winner:
+            self.manager.get_screen('results').labelText = "Loser!"
+        self.manager.get_screen('results').labelText += "\nNext round in 5 seconds"
+        self.manager.current = 'results'
 
     def getNewGameKey(self):
         game_key = randint(100000, 999999)
@@ -439,7 +461,7 @@ class StartMultiPlayerGameScreen(Screen):
         self.server_messages += " Connected to server!"
         self.session = session
         self.trying_to_connect = False
-        p_name = App.get_running_app().config.get('main_settings', 
+        self.p_name = App.get_running_app().config.get('main_settings', 
                                                   'playername')
         if self.new_game:
             rounds = App.get_running_app().config.get('main_settings', 
@@ -447,7 +469,7 @@ class StartMultiPlayerGameScreen(Screen):
             oi = App.get_running_app().config.get('main_settings', 
                                                   'optionsimages')                                                  
             yield self.session.call(u'org.splendidsnap.app.game.newgame', 
-                              self.game_key, rounds, oi, p_name)
+                              self.game_key, rounds, oi, self.p_name)
             self.button_txt = "Start Game with Current Players"
             self.ids['nextbutton'].disabled = False
             self.ids['nextbutton'].bind(on_press=self.startGame)
@@ -455,7 +477,7 @@ class StartMultiPlayerGameScreen(Screen):
         else:
             # join exisiting game            
             yield self.session.call(u'org.splendidsnap.app.game.joingame',
-                              self.game_key, p_name)
+                              self.game_key, self.p_name)
             self.button_txt = "Waiting for game to start"
             self.ids['nextbutton'].disabled = True
             self.game_key_label = "Game Key: " + str(self.game_key)

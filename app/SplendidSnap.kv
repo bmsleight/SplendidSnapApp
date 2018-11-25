@@ -97,7 +97,7 @@ MyScreenManager:
     id: cards
     on_pre_enter: root.populateCards()
     on_enter:     root.clockStart()
-    on_pre_leave: root.clockStop()
+#    on_pre_leave: root.clockStop()
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
@@ -148,11 +148,12 @@ MyScreenManager:
     BoxLayout:
         canvas:
             Color:
-                rgba: root.manager.blue
+                rgba: root.manager.orange
             Rectangle:
                 size: self.size
                 pos: self.pos            
         MenuButton:
+            id: button
             font_size: dp(25)
             text: root.labelText
             on_release: root.manager.current = 'cards'

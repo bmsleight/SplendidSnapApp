@@ -34,11 +34,12 @@ from autobahn.twisted.wamp import ApplicationSession
 from cardarrangement import *
 from random import random, randint
 
+from time import sleep
 
 class MultiplayerGameOptions:
     def __init__(self, game_key, rounds, optionsimages):
         self.game_key = game_key
-        self.rounds = rounds
+        self.rounds = int(rounds)
         self.optionsimages = optionsimages
         self.players = []
         self.start = False
@@ -69,7 +70,9 @@ class MultiplayerGames:
     def getCard(self, game_key):
         return_g = None
         for g in self.games:
-            if g.game_key == game_key:
+            print(g.game_key, type(g.game_key), game_key, type(game_key))
+            print(str(g.game_key) == str(game_key))
+            if str(g.game_key) == str(game_key):
                 return_g = g
                 break
         return return_g
@@ -92,6 +95,19 @@ class MultiplayerGames:
         if return_g:
             remote_set = return_g.cardSet()
         return remote_set
+    def match(self, game_key, player_name):
+        return_g = self.getCard(game_key)
+        if return_g:
+            return_g.winners.append(player_name)
+            return_g.current_round += 1
+            if return_g.current_round >return_g.rounds:
+                print("Finish")
+                return "next Round"
+            else:
+                print("next Round")
+                return "next Round"
+        else:
+            return None
 
 
 class GamesBackend(ApplicationSession):
@@ -107,9 +123,8 @@ class GamesBackend(ApplicationSession):
 
 
     def printPublish(self, purl, r_object=None):
-        print("Publish to ", purl)
         self.publish(purl, r_object)
-        print("Joined ", purl, " Data :", r_object)
+        print("Pushed ", purl, " Data :", r_object)
 
     @wamp.register(u'org.splendidsnap.app.game.newgame')
     def getNewGame(self, game_key, rounds, optionsimages, player_name):
@@ -117,25 +132,24 @@ class GamesBackend(ApplicationSession):
         game.players.append(player_name)
         self.games.addGame(game)
         print(game_key, rounds, optionsimages, player_name)
+        return True
 
     @wamp.register(u'org.splendidsnap.app.game.joingame')
     def getJoinGame(self, game_key, player_name):
         game = self.games.joinGame(int(game_key), player_name)
         if game:
-            
             publish_game_joined = u'org.splendidsnap.app.game.joined.'+\
                                   str(game_key)
             self.printPublish(publish_game_joined, player_name)
         else:
-            print("Game key not valid") 
+            print("Game key not valid")
+        return True
 
     @wamp.register(u'org.splendidsnap.app.game.startpush')
     def pushStartGame(self, game_key):
         game = self.games.startGame(int(game_key))
         if game:
-            publish_game_start = u'org.splendidsnap.app.game.start.'+\
-                                  str(game_key)
-            self.printPublish(publish_game_start)
+            print("Started: ", int(game_key))
         else:
             print("Game key not valid") 
 
@@ -150,6 +164,22 @@ class GamesBackend(ApplicationSession):
             self.printPublish(publish_game_card, remote_set)
         else:
             pass
+
+    @wamp.register(u'org.splendidsnap.app.game.matchpush')
+    def pushMatchCard(self, details):
+        results = self.games.match(details['game_key'], 
+                                      details['player_name'])
+        print("matches ?")
+        print(results)
+        print("matches ?")        
+        if results:
+            if results == "next Round":
+                self.printPublish(u'org.splendidsnap.app.game.winner.' +\
+                                  str(details['game_key']))
+                print("Next round in ....")
+        else:
+            pass
+        return True
 
 
     @inlineCallbacks

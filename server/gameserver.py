@@ -31,7 +31,9 @@ from twisted.internet.defer import inlineCallbacks
 from autobahn import wamp
 from autobahn.twisted.wamp import ApplicationSession
 
-import time
+from cardarrangement import *
+from random import random, randint
+
 
 class MultiplayerGameOptions:
     def __init__(self, game_key, rounds, optionsimages):
@@ -41,28 +43,55 @@ class MultiplayerGameOptions:
         self.players = []
         self.start = False
         self.current_round = 0
+        self.winners = []
+        icons = IconPositionsGroup()
+        self.max_positions = icons.possiblePositions() - 1
+    def cardSet(self):
+        # All players get the same card set
+        remote_set = {}
+        cards = simple_card_list(7)
+        remote_set['left_card'] = randint(0,len(cards)-1)
+        remote_set['right_card'] = randint(0,len(cards)-1)
+        while remote_set['left_card'] == remote_set['right_card']:
+            remote_set['right_card'] = randint(0,len(cards)-1)
+        remote_set['use_group_l'] = randint(0,self.max_positions)
+        remote_set['use_group_r'] = randint(0,self.max_positions)
+        remote_set['oi'] = self.optionsimages
+        # A soem point update curent_round
+        return remote_set
+
 
 class MultiplayerGames:
     def __init__(self):
         self.games = []
     def addGame(self, game):
         self.games.append(game)
-    def joinGame(self, game_key, player_name):
+    def getCard(self, game_key):
         return_g = None
         for g in self.games:
             if g.game_key == game_key:
                 return_g = g
-                g.players.append(player_name)
                 break
+        return return_g
+        
+    def joinGame(self, game_key, player_name):
+        return_g = self.getCard(game_key)
+        if return_g:
+            return_g.players.append(player_name)
         return return_g
     def startGame(self, game_key):
         return_sg = False
-        for g in self.games:
-            if int(g.game_key) == int(game_key):
-                g.start =  True
-                return_sg = True
-                break
+        return_g = self.getCard(game_key)
+        if return_g:
+            return_g.start =  True
+            return_sg = True
         return return_sg
+    def nextCard(self, game_key):
+        remote_set = None
+        return_g = self.getCard(game_key)
+        if return_g:
+            remote_set = return_g.cardSet()
+        return remote_set
 
 
 class GamesBackend(ApplicationSession):
@@ -76,6 +105,12 @@ class GamesBackend(ApplicationSession):
     def init(self):
         pass
 
+
+    def printPublish(self, purl, r_object=None):
+        print("Publish to ", purl)
+        self.publish(purl, r_object)
+        print("Joined ", purl, " Data :", r_object)
+
     @wamp.register(u'org.splendidsnap.app.game.newgame')
     def getNewGame(self, game_key, rounds, optionsimages, player_name):
         game = MultiplayerGameOptions(game_key, rounds, optionsimages)
@@ -87,11 +122,10 @@ class GamesBackend(ApplicationSession):
     def getJoinGame(self, game_key, player_name):
         game = self.games.joinGame(int(game_key), player_name)
         if game:
+            
             publish_game_joined = u'org.splendidsnap.app.game.joined.'+\
                                   str(game_key)
-            print("Publish to", publish_game_joined)
-            self.publish(publish_game_joined, player_name)
-            print("Joined :", game_key, player_name)
+            self.printPublish(publish_game_joined, player_name)
         else:
             print("Game key not valid") 
 
@@ -101,11 +135,21 @@ class GamesBackend(ApplicationSession):
         if game:
             publish_game_start = u'org.splendidsnap.app.game.start.'+\
                                   str(game_key)
-            print("Publish to", publish_game_start)
-            self.publish(publish_game_start)
-            print("start :", game_key)
+            self.printPublish(publish_game_start)
         else:
             print("Game key not valid") 
+
+
+    @wamp.register(u'org.splendidsnap.app.game.cardpush')
+    def pushNextCard(self, game_key):
+        remote_set = self.games.nextCard(game_key)
+        if remote_set:
+            # nextCard
+            publish_game_card = u'org.splendidsnap.app.game.card.'+\
+                                  str(game_key)
+            self.printPublish(publish_game_card, remote_set)
+        else:
+            pass
 
 
     @inlineCallbacks

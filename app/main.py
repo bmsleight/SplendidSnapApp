@@ -149,6 +149,9 @@ class SnapArrayButtonClass:
         rbutton.add_widget(btn)
         self.rbuttons.append(rbutton)
         return rbutton
+    def resetAllButtons(self):
+        for btn in self.rbuttons:
+            btn.children[0].state = 'normal'
 
 
 class IntroScreen(Screen):
@@ -162,6 +165,8 @@ class CardsScreen(Screen):
         self.total_correct = 0
         self.total_dseconds = 0
         self.remote_set = {}
+        self.left_buttons = None
+        self.right_buttons = None
     def newGuess(self, guess):
         if self.guess == "None":
             self.guess = guess
@@ -171,6 +176,10 @@ class CardsScreen(Screen):
                 text = "Success!"
             else:
                 text = "Failure!"
+                print("Reset All Buttons")
+                
+                self.left_buttons.resetAllButtons()
+                self.right_buttons.resetAllButtons()
             self.guess = "None"
             return text
     def clearGuess(self, guess):
@@ -214,13 +223,15 @@ class CardsScreen(Screen):
                 use_group_l = None
                 use_group_r = None
             # Set left and rright
-            self.addCardsToFLayer("SnapFloatLayoutLeft", max_x, max_y, 
+            self.left_buttons = self.addCardsToFLayer( \
+                                  "SnapFloatLayoutLeft", max_x, max_y, 
                                   "./images/" + oi + "/", 
                                   cards[left_card],
                                   use_group_l
                                   )
             
-            self.addCardsToFLayer("SnapFloatLayoutRight", max_x, max_y, 
+            self.right_buttons = self.addCardsToFLayer( \
+                                   "SnapFloatLayoutRight", max_x, max_y, 
                                   "./images/" + oi + "/", 
                                   cards[right_card],
                                   use_group_r
@@ -251,6 +262,8 @@ class CardsScreen(Screen):
                                           card[i]
                                           )
             fl.add_widget(rbutton)
+        return rbuttons
+        
     def removeCardsFromFLayer(self):
         total_correct_return = 0
         self.total_correct = self.total_correct + 1
@@ -283,11 +296,11 @@ class CardsScreen(Screen):
 class NotifyScreen(Screen):
     labelText = StringProperty('My label')
     time_str = StringProperty('Boo')
+
     
 
 class ResultsScreen(Screen):
     labelText = StringProperty('My label')
-    pass
 
 
 class HighScoresScreen(Screen):
@@ -350,6 +363,11 @@ class GameWampComponent(ApplicationSession):
                    u'org.splendidsnap.app.game.winner.',
                    self.config.extra['game_key']
                    )
+        self.subto(ui.on_end_message,
+                   u'org.splendidsnap.app.game.end.',
+                   self.config.extra['game_key']
+                   )
+#        
         print("Subs done")
 
 class StartMultiPlayerGameScreen(Screen):
@@ -422,10 +440,21 @@ class StartMultiPlayerGameScreen(Screen):
 
     def on_winner_message(self, details):
         self.manager.get_screen('results').ids['button'].disabled = True
+        print(details, details['player_name'])
         if not self.winner:
-            self.manager.get_screen('results').labelText = "Loser!"
-        self.manager.get_screen('results').labelText += "\nNext round in 5 seconds"
+            self.manager.get_screen('results').labelText = "Loser!"  +\
+                                                         "\nWinner " +\
+                                            str(details['player_name'])
         self.manager.current = 'results'
+
+    def on_end_message(self, game):
+        # Un subcribe
+        # disconnect
+        # send results to ...
+        # option for replay w/out entering number
+        print("The End")
+        self.manager.current = 'notify'
+        
 
     def getNewGameKey(self):
         game_key = randint(100000, 999999)

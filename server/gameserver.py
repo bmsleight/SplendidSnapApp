@@ -100,14 +100,16 @@ class MultiplayerGames:
         if return_g:
             return_g.winners.append(player_name)
             return_g.current_round += 1
-            if return_g.current_round >return_g.rounds:
+            if return_g.current_round == return_g.rounds:
+                # Remove & return return_g 
+                return_g = self.games.pop(self.games.index(return_g))
                 print("Finish")
-                return "next Round"
+                return return_g, "Finish"
             else:
                 print("next Round")
-                return "next Round"
+                return return_g, "next Round"
         else:
-            return None
+            return None, None
 
 
 class GamesBackend(ApplicationSession):
@@ -167,16 +169,19 @@ class GamesBackend(ApplicationSession):
 
     @wamp.register(u'org.splendidsnap.app.game.matchpush')
     def pushMatchCard(self, details):
-        results = self.games.match(details['game_key'], 
+        game, results = self.games.match(details['game_key'], 
                                       details['player_name'])
-        print("matches ?")
-        print(results)
-        print("matches ?")        
         if results:
             if results == "next Round":
-                self.printPublish(u'org.splendidsnap.app.game.winner.' +\
-                                  str(details['game_key']))
+                self.printPublish(u'org.splendidsnap.app.game.winner.'+\
+                                  str(details['game_key']),
+                                  details)
                 print("Next round in ....")
+            else:
+                print("Send end screen")
+                self.printPublish(u'org.splendidsnap.app.game.end.'+\
+                                  str(details['game_key']),
+                                  details)
         else:
             pass
         return True

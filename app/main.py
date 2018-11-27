@@ -469,15 +469,18 @@ class StartMultiPlayerGameScreen(Screen):
             if self.trying_to_connect:
                 pass
             else:
+                print("Try to connect to server")
                 self.trying_to_connect = True
                 self.server_messages += "Contacting server ... "
-                url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
+#                url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
+                url, realm = u"ws://192.168.1.127:8080/ws", u"SpledidSnapApp"
                 self.server_messages += url 
                 runner = ApplicationRunner(url=url,
                                            realm=realm,
                                            extra=dict(ui=self, 
                                                       game_key=self.game_key))
                 runner.run(GameWampComponent, start_reactor=False)
+                print("runner.run OK")
 
 
     def on_join_message(self, player_name):
@@ -505,7 +508,7 @@ class StartMultiPlayerGameScreen(Screen):
 
         else:
             # join exisiting game            
-            yield self.session.call(u'org.splendidsnap.app.game.joingame',
+            self.session.call(u'org.splendidsnap.app.game.joingame',
                               self.game_key, self.p_name)
             self.button_txt = "Waiting for game to start"
             self.ids['nextbutton'].disabled = True

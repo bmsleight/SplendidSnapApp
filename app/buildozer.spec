@@ -37,7 +37,8 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = kivy
+#requirements = kivy, twisted, autobahn, txaio, crossbar
+requirements = kivy,crossbar
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -89,6 +90,8 @@ fullscreen = 0
 
 # (list) Permissions
 #android.permissions = INTERNET
+android.permissions = INTERNET
+
 
 # (int) Android API to use
 #android.api = 19

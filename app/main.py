@@ -97,6 +97,7 @@ class IconButton(ToggleButtonBehavior, Image):
         else:
             if guess_result == "Success!":
                 remote_set = screen.manager.get_screen('cards').remote_set
+                # remove at end ?
                 total_correct_return = screen.removeCardsFromFLayer()
                 if remote_set:
                     # Remote call
@@ -447,12 +448,23 @@ class StartMultiPlayerGameScreen(Screen):
                                             str(details['player_name'])
         self.manager.current = 'results'
 
-    def on_end_message(self, game):
+    def on_end_message(self, leagueTable):
         # Un subcribe
         # disconnect
         # send results to ...
         # option for replay w/out entering number
         print("The End")
+        # leagueTable
+        self.manager.get_screen('notify').labelText = ""
+        for entry in leagueTable:
+            player_name, wins = entry
+            self.manager.get_screen('notify').labelText += "Player: " +\
+                                                        player_name   +\
+                                                        " total wins "+\
+                                                        str(wins) + "\n"
+        self.session = None
+        self.new_game = False
+        self.game_key = None
         self.manager.current = 'notify'
         
 
@@ -472,7 +484,6 @@ class StartMultiPlayerGameScreen(Screen):
                 print("Try to connect to server")
                 self.trying_to_connect = True
                 self.server_messages += "Contacting server ... "
-#                url, realm = u"ws://localhost:8080/ws", u"SpledidSnapApp"
                 url, realm = u"ws://192.168.1.127:8080/ws", u"SpledidSnapApp"
                 self.server_messages += url 
                 runner = ApplicationRunner(url=url,
@@ -513,7 +524,7 @@ class StartMultiPlayerGameScreen(Screen):
             self.button_txt = "Waiting for game to start"
             self.ids['nextbutton'].disabled = True
             self.game_key_label = "Game Key: " + str(self.game_key)
-
+            
         self.server_messages += "\nWaiting for more players.\n"
 
 

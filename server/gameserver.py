@@ -60,6 +60,13 @@ class MultiplayerGameOptions:
         remote_set['oi'] = self.optionsimages
         # A soem point update curent_round
         return remote_set
+    def leagueTable(self):
+        league = {}
+        for i in set(self.winners):
+            league[i]=self.winners.count(i)
+        league_sorted = [(k, league[k]) for k in sorted(league, 
+                                          key=league.get, reverse=True)]
+        return league_sorted
 
 
 class MultiplayerGames:
@@ -179,9 +186,10 @@ class GamesBackend(ApplicationSession):
                 print("Next round in ....")
             else:
                 print("Send end screen")
+                leagueTable = game.leagueTable()
                 self.printPublish(u'org.splendidsnap.app.game.end.'+\
                                   str(details['game_key']),
-                                  details)
+                                  leagueTable)
         else:
             pass
         return True

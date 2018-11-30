@@ -79,11 +79,11 @@ MyScreenManager:
             orientation: 'vertical'
             BoxLayout:
                 MenuButton:
-                    text: 'Start a new mutli-player game'
+                    text: 'Start a new multi-player game'
                     on_release: app.root.current = 'smpgame'
             BoxLayout:
                 MenuButton:
-                    text: 'Join a mutli-player game using game code'
+                    text: 'Join a multi-player game'
                     on_release: app.root.current = 'jmpgame'
             BoxLayout:
                 MenuButton:
@@ -363,13 +363,13 @@ MyScreenManager:
                 size: self.size
                 pos: self.pos    
         Label:
-            size_hint: (1, 0.45)
+ #           size_hint: (1, 0.45)
             font_size: dp(25)
             color: root.manager.orange
             text: "Join Multi-player game"
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: (1, 0.1)
+            size_hint: (1, 0.4)
             BoxLayout:
             Label:
                 font_size: dp(25)
@@ -392,5 +392,7 @@ MyScreenManager:
 
             BoxLayout:
         BoxLayout:
-            size_hint: (1, 0.45)
+  #          size_hint: (1, 0.45)
+        BoxLayout:
+        BoxLayout:
     

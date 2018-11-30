@@ -44,19 +44,8 @@
                         "port": 8080
                     },
                     "paths": {
-                        "/": {
-                            "type": "static",
-                            "directory": "../web"
-                        },
-                        "shared": {
-                            "type": "static",
-                            "directory": "../../../../_shared-web-resources"
-                        },
                         "ws": {
                             "type": "websocket"
-                        },
-                        "lp": {
-                            "type": "longpoll"
                         }
                     }
                 }

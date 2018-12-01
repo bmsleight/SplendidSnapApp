@@ -1,0 +1,17 @@
+[Unit]
+Description=Crossbar.io
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+Environment="MYVAR1=foobar"
+ExecStart=/usr/local/bin/crossbar start --cbdir=/home/app/SplendidSnapApp/server/.crossbar
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

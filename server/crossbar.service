@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
-User=ubuntu
-Group=ubuntu
+User=app
+Group=app
 StandardInput=null
 StandardOutput=journal
 StandardError=journal
-Environment="MYVAR1=foobar"
+#Environment="MYVAR1=foobar"
 ExecStart=/usr/local/bin/crossbar start --cbdir=/home/app/SplendidSnapApp/server/.crossbar
 Restart=on-abort
 

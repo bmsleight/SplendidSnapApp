@@ -135,7 +135,7 @@ class GamesBackend(ApplicationSession):
         self.publish(purl, r_object)
         print("Pushed ", purl, " Data :", r_object)
 
-    @wamp.register(u'org.splendidsnap.app.game.newgame')
+    @wamp.register(u'com.splendidsnap.app.game.newgame')
     def getNewGame(self, game_key, rounds, optionsimages, player_name):
         game = MultiplayerGameOptions(game_key, rounds, optionsimages)
         game.players.append(player_name)
@@ -143,18 +143,18 @@ class GamesBackend(ApplicationSession):
         print(game_key, rounds, optionsimages, player_name)
         return True
 
-    @wamp.register(u'org.splendidsnap.app.game.joingame')
+    @wamp.register(u'com.splendidsnap.app.game.joingame')
     def getJoinGame(self, game_key, player_name):
         game = self.games.joinGame(int(game_key), player_name)
         if game:
-            publish_game_joined = u'org.splendidsnap.app.game.joined.'+\
+            publish_game_joined = u'com.splendidsnap.app.game.joined.'+\
                                   str(game_key)
             self.printPublish(publish_game_joined, player_name)
         else:
             print("Game key not valid")
         return True
 
-    @wamp.register(u'org.splendidsnap.app.game.startpush')
+    @wamp.register(u'com.splendidsnap.app.game.startpush')
     def pushStartGame(self, game_key):
         game = self.games.startGame(int(game_key))
         if game:
@@ -163,31 +163,31 @@ class GamesBackend(ApplicationSession):
             print("Game key not valid") 
 
 
-    @wamp.register(u'org.splendidsnap.app.game.cardpush')
+    @wamp.register(u'com.splendidsnap.app.game.cardpush')
     def pushNextCard(self, game_key):
         remote_set = self.games.nextCard(game_key)
         if remote_set:
             # nextCard
-            publish_game_card = u'org.splendidsnap.app.game.card.'+\
+            publish_game_card = u'com.splendidsnap.app.game.card.'+\
                                   str(game_key)
             self.printPublish(publish_game_card, remote_set)
         else:
             pass
 
-    @wamp.register(u'org.splendidsnap.app.game.matchpush')
+    @wamp.register(u'com.splendidsnap.app.game.matchpush')
     def pushMatchCard(self, details):
         game, results = self.games.match(details['game_key'], 
                                       details['player_name'])
         if results:
             if results == "next Round":
-                self.printPublish(u'org.splendidsnap.app.game.winner.'+\
+                self.printPublish(u'com.splendidsnap.app.game.winner.'+\
                                   str(details['game_key']),
                                   details)
                 print("Next round in ....")
             else:
                 print("Send end screen")
                 leagueTable = game.leagueTable()
-                self.printPublish(u'org.splendidsnap.app.game.end.'+\
+                self.printPublish(u'com.splendidsnap.app.game.end.'+\
                                   str(details['game_key']),
                                   leagueTable)
         else:

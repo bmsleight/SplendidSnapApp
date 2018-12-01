@@ -17,7 +17,7 @@
                             "name": "anonymous",
                             "permissions": [
                                 {
-                                    "uri": "org.splendidsnap.app.game.",
+                                    "uri": "com.splendidsnap.app.game.",
                                     "match": "prefix",
                                     "allow": {
                                         "call": true,

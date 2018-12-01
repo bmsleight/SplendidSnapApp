@@ -18,7 +18,12 @@ Good Luck!
 
 Ready? Splendid!
 
-![](https://github.com/bmsleight/SplendidSnapApp/blob/master/docs/video/SplendidSnapAppPreview.mp4?raw=true)
+
+<div align="center" class="embed-responsive embed-responsive-16by9">
+    <video controls >
+        <source src="https://raw.githack.com/bmsleight/SplendidSnapApp/master/docs/video/SplendidSnapAppPreview.mp4" type="video/mp4">
+    </video>
+</div>
 
 
 # Android

@@ -349,23 +349,23 @@ class GameWampComponent(ApplicationSession):
         ui = self.config.extra['ui']
         ui.on_session(self)
         self.subto(ui.on_join_message, 
-                   u'org.splendidsnap.app.game.joined.',
+                   u'com.splendidsnap.app.game.joined.',
                    self.config.extra['game_key']
                    )
         self.subto(ui.on_start_message, 
-                   u'org.splendidsnap.app.game.start.',
+                   u'com.splendidsnap.app.game.start.',
                    self.config.extra['game_key']
                    )
         self.subto(ui.on_card_message, 
-                   u'org.splendidsnap.app.game.card.',
+                   u'com.splendidsnap.app.game.card.',
                    self.config.extra['game_key']
                    )
         self.subto(ui.on_winner_message,
-                   u'org.splendidsnap.app.game.winner.',
+                   u'com.splendidsnap.app.game.winner.',
                    self.config.extra['game_key']
                    )
         self.subto(ui.on_end_message,
-                   u'org.splendidsnap.app.game.end.',
+                   u'com.splendidsnap.app.game.end.',
                    self.config.extra['game_key']
                    )
 #        
@@ -406,9 +406,9 @@ class StartMultiPlayerGameScreen(Screen):
             self.server_messages += "."
 
     def startGame(self, *args):
-        self.session.call(u'org.splendidsnap.app.game.startpush', 
+        self.session.call(u'com.splendidsnap.app.game.startpush', 
                           self.game_key)
-        self.session.call(u'org.splendidsnap.app.game.cardpush', 
+        self.session.call(u'com.splendidsnap.app.game.cardpush', 
                           self.game_key)
 
     def delayNewCard(self):
@@ -416,7 +416,7 @@ class StartMultiPlayerGameScreen(Screen):
         self.winner = False
         self.manager.get_screen('results').ids['button'].disabled = False
         if self.session:
-            self.session.call(u'org.splendidsnap.app.game.cardpush', 
+            self.session.call(u'com.splendidsnap.app.game.cardpush', 
                           self.game_key)
 
     def multiMatch(self):
@@ -424,7 +424,7 @@ class StartMultiPlayerGameScreen(Screen):
         details['game_key'] = self.game_key
         details['player_name'] = self.p_name
         if self.session:
-            self.session.call(u'org.splendidsnap.app.game.matchpush', 
+            self.session.call(u'com.splendidsnap.app.game.matchpush', 
                           details)
         self.winner = True
         # What a headache! - Buy the the GUI update!
@@ -484,7 +484,8 @@ class StartMultiPlayerGameScreen(Screen):
                 print("Try to connect to server")
                 self.trying_to_connect = True
                 self.server_messages += "Contacting server ... "
-                url, realm = u"ws://192.168.1.127:8080/ws", u"SpledidSnapApp"
+                url, realm = u"ws://app.splendidsnap.com:8080/ws", u"SpledidSnapApp"
+#                url, realm = u"ws://192.168.1.127:8080/ws", u"SpledidSnapApp"
                 self.server_messages += url 
                 runner = ApplicationRunner(url=url,
                                            realm=realm,
@@ -511,7 +512,7 @@ class StartMultiPlayerGameScreen(Screen):
                                                   'totaltowinsolo')
             oi = App.get_running_app().config.get('main_settings', 
                                                   'optionsimages')                                                  
-            yield self.session.call(u'org.splendidsnap.app.game.newgame', 
+            yield self.session.call(u'com.splendidsnap.app.game.newgame', 
                               self.game_key, rounds, oi, self.p_name)
             self.button_txt = "Start Game with Current Players"
             self.ids['nextbutton'].disabled = False
@@ -519,7 +520,7 @@ class StartMultiPlayerGameScreen(Screen):
 
         else:
             # join exisiting game            
-            self.session.call(u'org.splendidsnap.app.game.joingame',
+            self.session.call(u'com.splendidsnap.app.game.joingame',
                               self.game_key, self.p_name)
             self.button_txt = "Waiting for game to start"
             self.ids['nextbutton'].disabled = True

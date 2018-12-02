@@ -24,7 +24,7 @@ Good Luck!
 
 Ready? Splendid!
 
-# Android
+## Android
 It is not in the Play Store (yet), but you can [install the pre-release version](https://github.com/bmsleight/SplendidSnapApp/tree/master/app/bin), 
  [apk](https://github.com/bmsleight/SplendidSnapApp/blob/master/app/bin/splendidsnapapp-0.1-debug.apk?raw=true)
 

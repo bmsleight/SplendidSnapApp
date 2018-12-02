@@ -18,13 +18,11 @@ Good Luck!
 
 Ready? Splendid!
 
-
-<div align="center" class="embed-responsive embed-responsive-16by9">
-    <video controls >
+<div class="embed-responsive embed-responsive-16by9 video">
+    <video controls class="embed-responsive-item">
         <source src="https://raw.githack.com/bmsleight/SplendidSnapApp/master/docs/video/SplendidSnapAppPreview.mp4" type="video/mp4">
     </video>
 </div>
-
 
 # Android
 It is not in the Play Store (yet), but you can [install the pre-release version](https://github.com/bmsleight/SplendidSnapApp/tree/master/app/bin), 

@@ -4,6 +4,12 @@ Playing snap has never been such splendid fun! No need to carry a pack of cards 
 
 Choose a set of cards you wish to play with, including transport, monsters, or world flags. Many more being added. Watch as a split screen appears before you. Find two matching icons to move to the next screen. You won't think there's a match... but there always will be!
 
+<div class="embed-responsive embed-responsive-16by9 video">
+    <video controls class="embed-responsive-item">
+        <source src="https://raw.githack.com/bmsleight/SplendidSnapApp/master/docs/video/SplendidSnapAppPreview.mp4" type="video/mp4">
+    </video>
+</div>
+
 ## Instructions:
 
 Once you click 'start solo game' a split screen will appear with 8 icons on each side. You need to find a matching icon on both sides and touch them on the screen. 
@@ -17,12 +23,6 @@ At the end of your game you will see your score time. Try and set the high score
 Good Luck! 
 
 Ready? Splendid!
-
-<div class="embed-responsive embed-responsive-16by9 video">
-    <video controls class="embed-responsive-item">
-        <source src="https://raw.githack.com/bmsleight/SplendidSnapApp/master/docs/video/SplendidSnapAppPreview.mp4" type="video/mp4">
-    </video>
-</div>
 
 # Android
 It is not in the Play Store (yet), but you can [install the pre-release version](https://github.com/bmsleight/SplendidSnapApp/tree/master/app/bin), 
@@ -49,7 +49,8 @@ Source of files - https://www.smashingmagazine.com/2014/11/free-hand-drawn-doodl
 
 ### Flags
 ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175036.jpg)
- Source of files, wikipedia + imagemagik to convert to named. (From a old porject)
+
+Source of files, wikipedia + imagemagik to convert to named. (From a old porject)
  
  ## Round
  ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-145500.jpg)
@@ -68,5 +69,3 @@ Source of files - https://www.smashingmagazine.com/2014/11/free-hand-drawn-doodl
 ![Screenshot](https://raw.githubusercontent.com/bmsleight/SplendidSnapApp/master/docs/screenshots/Screenshot_20181118-175141.jpg)
 
 Source of files - https://roundicons.com - 100 Free Flat Icons Vol 2.zip
-
-

@@ -45,6 +45,14 @@ from twisted.internet.defer import inlineCallbacks
 
 
 
+
+
+#global fonts
+from kivy.config import Config
+print("h")
+Config.set('kivy', 'default_font', ['Raleway', 'data/fonts/Raleway-Regular.ttf', 'data/fonts/Raleway-Italic.ttf', 'data/fonts/Raleway-Bold.ttf', 'data/fonts/Raleway-BoldItalic.ttf'])
+Config.write()
+
 class ClockRect(Widget):
     def __init__(self, **kwargs):
         super(ClockRect, self).__init__(**kwargs)
@@ -542,7 +550,7 @@ class MyScreenManager(ScreenManager):
 
 class SplendidSnapApp(App):
     def build(self):
-        self.use_kivy_settings = False
+        self.use_kivy_settings = True
         self.bind(on_start=self.post_build_init)
         return Builder.load_file('SplendidSnap.kv')
 
@@ -564,6 +572,7 @@ class SplendidSnapApp(App):
             'optionsimages': 'doodle',
             'playername': "Player_" + str(randint(100000, 999999))
             })
+#        config.setdefaults('kivy', {'default_font': ['Roboto', 'data/fonts/Roboto-Regular.ttf', 'data/fonts/Roboto-Italic.ttf', 'data/fonts/Roboto-Bold.ttf', 'data/fonts/Roboto-BoldItalic.ttf']})
 
     def build_settings(self, settings):
         Setting = Settings()

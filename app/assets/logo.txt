@@ -9,3 +9,39 @@ convert logo_no_words.png  \( +clone -rotate 90 +clone -mosaic +level-colors whi
 convert logo_no_words_square_padded.png -alpha off -resize 256x256 -define icon:auto-resize="256,128,96,64,48,32,16" favicon.ico
 
 convert logo_no_words_square_padded.png -alpha off -resize 64x64 logo_icon_size.png
+
+convert logo.png   -background "#ff9b00"  -fill "#3064c7" -size 560x   -pointsize 36 caption:'Install the Android app and play...  '  -gravity Center -append  -background white -flatten  logo_app.png
+
+
+convert logo.png   -background "#ff9b00"  -fill "#3064c7"   -pointsize 36 caption:'https://SplendidSnap.com'  -gravity Center -append -background white -flatten logo_tinyurl.png
+
+
+convert -background white -gravity west  /home/bms/SplendidSnapApp/app/assets/logo_no_words.png -resize 1080x544 -extent 1090x544 ./logo_resize.png
+
+
+
+convert -background "#ff9b00" -size 554x  -fill "#3064c7"  -gravity center label:"https://SplendidSnap.com"  -bordercolor white -border 10 url.png
+
+https://www.fontsquirrel.com/fonts/raleway
+
+convert -background "#ff9b00" -size 554x  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Light.ttf label:"https://SplendidSnap.com"  -bordercolor white -border 10 url.png
+montage /home/bms/SplendidSnapApp/app/assets/logo.png url.png -mode Concatenate  -tile 1x temp.png ; display temp.png 
+convert -background white -gravity center  temp.png -resize 1080x544 -extent 1090x544 ./logo_url.png
+
+convert -background "#ff9b00" -size 554x  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf label:" https://SplendidSnap.com "  -bordercolor white -border 10 url.png ; montage /home/bms/SplendidSnapApp/app/assets/logo.png url.png -mode Concatenate  -tile 1x temp.png ;  convert -background white -gravity center  temp.png -resize 1080x544 -extent 1090x544 ./logo_url.png ; display logo_url.png 
+
+
+convert -background "#ff9b00" -size 554x  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf label:"Players joing using game key"  -bordercolor white -border 10 url.png ; montage /home/bms/SplendidSnapApp/app/assets/logo_no_words_square_padded.png t1.png -mode Concatenate  -tile 1x temp.png ;  convert -background white -gravity center  temp.png -resize 1080x544 -extent 1090x544 ./game_key.png ; display game_key.png 
+
+convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf label:"Players join using game key"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./game_key.png ; display game_key.png
+
+
+convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"You won’t think there’s a match… \nbut there always will be!"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./no_match.png ; display no_match.png
+
+
+convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"Everyone knows the winner… \nNext round in 5 seconds"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./5_secs.png ; display 5_secs.png
+
+
+convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"Typical game last 60s… \n(Shown at x10 speed)"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./speed.png ; display speed.png
+
+

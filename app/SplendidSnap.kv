@@ -1,6 +1,10 @@
 #:import Window kivy.core.window.Window
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import FallOutTransition kivy.uix.screenmanager.FallOutTransition 
+ 
 
 MyScreenManager:
+    transition: FallOutTransition()
     IntroScreen:
     CardsScreen:
     MultiMenuScreen:
@@ -97,7 +101,7 @@ MyScreenManager:
     id: cards
     on_pre_enter: root.populateCards()
     on_enter:     root.clockStart()
-#    on_pre_leave: root.clockStop()
+    on_pre_leave: root.clockStop()
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:

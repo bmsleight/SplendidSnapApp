@@ -196,6 +196,7 @@ android.permissions = INTERNET
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86
 android.arch = armeabi-v7a
+#android.arch = x86
 
 #
 # Python for android (p4a) specific

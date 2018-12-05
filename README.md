@@ -10,6 +10,12 @@ Choose a set of cards you wish to play with, including transport, monsters, or w
     </video>
 </div>
 
+<div class="embed-responsive embed-responsive-16by9 video">
+    <video controls class="embed-responsive-item">
+        <source src="https://raw.githack.com/bmsleight/SplendidSnapApp/master/docs/video/MultiPlayer.mp4" type="video/mp4">
+    </video>
+</div>
+
 ## Instructions:
 
 Once you click 'start solo game' a split screen will appear with 8 icons on each side. You need to find a matching icon on both sides and touch them on the screen. 

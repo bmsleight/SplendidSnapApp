@@ -21,7 +21,8 @@ settings_json = json.dumps([
      'key': 'optionsimages',
      'options': ['traffic', 'doodle',  
                  'flags', 'hipster', 'monster', 
-                'railway', 'round', 'social']},
+                'railway', 'round', 'social',
+                'sports']},
      ])
 
   

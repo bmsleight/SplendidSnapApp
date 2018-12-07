@@ -48,10 +48,10 @@ from twisted.internet.defer import inlineCallbacks
 
 
 #global fonts
-from kivy.config import Config
-print("h")
-Config.set('kivy', 'default_font', ['Raleway', 'data/fonts/Raleway-Regular.ttf', 'data/fonts/Raleway-Italic.ttf', 'data/fonts/Raleway-Bold.ttf', 'data/fonts/Raleway-BoldItalic.ttf'])
-Config.write()
+#from kivy.config import Config
+#print("h")
+#Config.set('kivy', 'default_font', ['Raleway', 'data/fonts/Raleway-Regular.ttf', 'data/fonts/Raleway-Italic.ttf', 'data/fonts/Raleway-Bold.ttf', 'data/fonts/Raleway-BoldItalic.ttf'])
+#Config.write()
 
 class ClockRect(Widget):
     def __init__(self, **kwargs):

@@ -47,3 +47,6 @@ https://roundicons.com/icon-packs/social-media-filled-outline-icons/
 mogrify -format png *.svg
 #https://bbs.archlinux.org/viewtopic.php?pid=1269845#p1269845
 
+
+https://www.shareicon.net/pack/sports?p=4
+https://www.shareicon.net/pack/sea-life

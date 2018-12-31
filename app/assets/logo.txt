@@ -44,4 +44,8 @@ convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -f
 
 convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"Typical game last 60s… \n(Shown at x10 speed)"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./speed.png ; display speed.png
 
+convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"Install the Android App\n\nPlay single player with high scores\nor online multiplayer"  -bordercolor white -border 10 t1.png ;  convert -background white -gravity center  t1.png -resize 1080x544 -extent 1090x544 ./install.png ; display install.png
+
+
+convert -background none -size 1080x544  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"3"  ./3.png ; display 3.png
 

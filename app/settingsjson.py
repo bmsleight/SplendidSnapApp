@@ -22,7 +22,7 @@ settings_json = json.dumps([
      'options': ['traffic', 'doodle',  
                  'flags', 'hipster', 'monster', 
                 'railway', 'round', 'social',
-                'sports']},
+                'sports', 'flag2']},
      ])
 
   

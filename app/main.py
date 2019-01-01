@@ -93,7 +93,7 @@ class IconButton(ToggleButtonBehavior, Image):
         screen = self.parent.parent.parent.parent.parent
         
         if value == 'down':
-            self.source = "./assets/logo.png"
+            self.source = "./assets/logo_no_words.png"
             guess_result = screen.newGuess(self.card_number)
         else:
             self.source = widget.img_up
@@ -152,7 +152,7 @@ class SnapArrayButtonClass:
                                  )
         btn = IconButton(angle=randint(0,360))
         btn.img_up = img_up
-        btn.img_dn = "./assets/logo.png"
+        btn.img_dn = "./assets/logo_no_words.png"
         btn.source = img_up
         btn.card_number = card_number
         rbutton.add_widget(btn)

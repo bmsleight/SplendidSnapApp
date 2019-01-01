@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone="no"?>
+
+<!-- For use with just Logo  -->
+<!--************************ -->
+<!--<svg width="128cm" height="12.8cm" viewBox="0 0 5120 512"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> -->
+<!-- <rect x="1" y="1" width="510" height="510" stroke="black" fill="transparent" stroke-width="1"/> -->
+<!-- ************************ -->
+
+<!-- For use with Logo and Words  -->
+<!--************************ -->
+<svg width="1024" height="500" viewBox="0 0 1024 500"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- width without ext icone on right is 1096 -->
+<!-- <rect x="0" y="0" width="1024" height="500" stroke="black" fill="transparent" stroke-width="1"/> -->
+<!-- <rect x="24" y="24" width="976" height="452" stroke="black" fill="transparent" stroke-width="1"/> -->
+
+<!--************************ -->
+
+
+
+  <defs>
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i");
+    </style>
+  </defs>
+
+  <!-- For use with Logo and Words  -->  
+  <!--  As height is 500, not 512 so boarder is 24 not 32 --> 
+  <!--  Matching closing </g> at end -->
+  <g transform="translate(-6,-6) rotate(0)">
+  <!--************************ -->
+  
+
+  <g font-family="Roboto" >
+    <g font-size="46" >
+      <g transform="translate(0,0) rotate(0)">
+        <text x="46" y="80" fill="#3064c7" >Splendid</text>
+        <text x="-186" y="-182" fill="#3064c7"  transform="translate(0,0) rotate(180)">Snap</text>
+        <path d="M 32,32
+                 l 200, 0
+                 l 0,80
+                 a30,30 0 1,1 0,36
+                 l 0,80 
+                 l -80,0
+                 a30,30 0 1,1 -36,0
+                 l -80,0
+                 l 0,-80
+                 a30,30 0 1,0 0,-36
+                 l 0,-80
+                 z"
+              fill="none" stroke="#ff9b00" stroke-width="8" />
+      </g>
+
+      <g transform="translate(520,385) rotate(150)"> 
+        <text x="46" y="80" fill="#3064c7" >Splendid</text>
+        <text x="-186" y="-182" fill="#3064c7"  transform="translate(0,0) rotate(180)">Snap</text>
+        <path d="M 32,32
+                 l 200, 0
+                 l 0,80
+                 a30,30 0 1,1 0,36
+                 l 0,80 
+                 l -80,0
+                 a30,30 0 1,1 -36,0
+                 l -80,0
+                 l 0,-80
+                 a30,30 0 1,0 0,-36
+                 l 0,-80
+                 z"
+              fill="none" stroke="#ff9b00" stroke-width="8" />
+      </g>
+
+
+    </g>
+
+    <!-- For use with Logo and Words  -->
+    <g font-size="190" >
+      <g transform="translate(200,0) rotate(0)">
+        <text x="84" y="190" fill="#3064c7" >Splendid</text>
+        <text x="280" y="416" fill="#3064c7" font-family="Roboto" >Snap</text>
+      </g>
+    </g>
+
+  <!-- For use with Logo and Words  -->  
+  <!--  As height is 500, not 512 so boarder is 24 not 32 --> 
+  <!--  Matching closing </g> at end -->
+  </g>
+  <!--************************ -->
+
+
+  </g>
+</svg>
+

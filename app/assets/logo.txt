@@ -49,3 +49,14 @@ convert -background "#ff9b00" -size 554x259  -fill "#3064c7"  -gravity center -f
 
 convert -background none -size 1080x544  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf   label:"3"  ./3.png ; display 3.png
 
+
+## New Logos
+
+
+inkscape     --export-png=logo.png --export-background=White  --without-gui /home/bms/SplendidSnapApp/app/assets/logo_base.svg
+
+convert -background "#ff9b00" -size 1024x  -fill "#3064c7"  -gravity center -font /home/bms/tmp/raleway/Raleway-Regular.ttf label:" https://SplendidSnap.com "  -bordercolor white -border 6 url.png ; montage ./logo_words.png url.png -mode Concatenate  -tile 1x temp.png ;  convert -background white -gravity center  temp.png -resize 1080x544 -extent 1090x544 ./logo_url.png ; display logo_url.png
+
+## Create pack
+inkscape     --export-png=logo.png --export-background=White  --without-gui logo_base_words.svg
+inkscape     --export-png=logo_no_words.png  --without-gui logo_base.svg 

@@ -1,0 +1,53 @@
+<?xml version="1.0" standalone="no"?>
+
+<svg width="512" height="512" viewBox="0 0 512 512"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <defs>
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i");
+    </style>
+  </defs>
+
+
+  <g font-family="Roboto" >
+    <g font-size="46" >
+      <g transform="translate(0,0) rotate(0)">
+        <text x="46" y="80" fill="#3064c7" >Splendid</text>
+        <text x="-186" y="-182" fill="#3064c7"  transform="translate(0,0) rotate(180)">Snap</text>
+        <path d="M 32,32
+                 l 200, 0
+                 l 0,80
+                 a30,30 0 1,1 0,36
+                 l 0,80 
+                 l -80,0
+                 a30,30 0 1,1 -36,0
+                 l -80,0
+                 l 0,-80
+                 a30,30 0 1,0 0,-36
+                 l 0,-80
+                 z"
+              fill="none" stroke="#ff9b00" stroke-width="8" />
+      </g>
+
+      <g transform="translate(520,385) rotate(150)"> 
+        <text x="46" y="80" fill="#3064c7" >Splendid</text>
+        <text x="-186" y="-182" fill="#3064c7"  transform="translate(0,0) rotate(180)">Snap</text>
+        <path d="M 32,32
+                 l 200, 0
+                 l 0,80
+                 a30,30 0 1,1 0,36
+                 l 0,80 
+                 l -80,0
+                 a30,30 0 1,1 -36,0
+                 l -80,0
+                 l 0,-80
+                 a30,30 0 1,0 0,-36
+                 l 0,-80
+                 z"
+              fill="none" stroke="#ff9b00" stroke-width="8" />
+      </g>
+    </g>
+  </g>
+</svg>
+

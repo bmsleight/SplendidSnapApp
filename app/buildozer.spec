@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = Splendid Snap App
+title = SplendidSnap
 
 # (str) Package name
 package.name = splendidsnapapp
@@ -29,7 +29,7 @@ source.include_patterns = images/signs/*
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 0.1.2
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -38,7 +38,7 @@ version = 0.1
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
 #requirements = kivy, twisted, autobahn, txaio, crossbar
-requirements = kivy,crossbar
+requirements = kivy,crossbar,twisted,autobahn,txaio
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -94,13 +94,14 @@ android.permissions = INTERNET
 
 
 # (int) Android API to use
-#android.api = 19
+android.api = 27
 
 # (int) Minimum API required
-#android.minapi = 9
+android.minapi = 21
+ndk-api=21
 
 # (int) Android SDK version to use
-#android.sdk = 20
+android.sdk = 28
 
 # (str) Android NDK version to use
 #android.ndk = 9c
@@ -109,10 +110,10 @@ android.permissions = INTERNET
 #android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-#android.ndk_path =
+android.ndk_path = /home/kivy/Android/android-ndk-r16b/
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
-#android.sdk_path =
+android.sdk_path = /home/kivy/Android/android-sdk-28/
 
 # (str) ANT directory (if empty, it will be automatically downloaded.)
 #android.ant_path =
@@ -203,7 +204,7 @@ android.arch = armeabi-v7a
 #
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
-#p4a.source_dir =
+p4a.source_dir = /home/kivy/Repos/python-for-android/
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
 #p4a.local_recipes =
@@ -236,7 +237,7 @@ android.arch = armeabi-v7a
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 1
+log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 1

@@ -60,3 +60,9 @@ convert -background "#ff9b00" -size 1024x  -fill "#3064c7"  -gravity center -fon
 ## Create pack
 inkscape     --export-png=logo.png --export-background=White  --without-gui logo_base_words.svg
 inkscape     --export-png=logo_no_words.png  --without-gui logo_base.svg 
+convert logo.png   -background "#ff9b00"  -fill "#3064c7"   -pointsize 24 caption:'Loading'  -gravity Center -append  logo_loading.png
+convert logo_no_words.png  \( +clone -rotate 90 +clone -mosaic +level-colors white \)  +swap -gravity center -composite    logo_no_words_square_padded.png
+convert logo_no_words_square_padded.png -alpha off -resize 256x256 -define icon:auto-resize="256,128,96,64,48,32,16" favicon.ico
+convert logo_no_words_square_padded.png -alpha off -resize 64x64 logo_icon_size.png
+
+https://stackoverflow.com/questions/51731647/kivy-android-app-set-the-api-level-from-19-to-26-failed/51736054

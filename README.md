@@ -31,8 +31,7 @@ Good Luck!
 Ready? Splendid!
 
 ## Android
-It is not in the Play Store (yet), but you can [install the pre-release version](https://github.com/bmsleight/SplendidSnapApp/tree/master/app/bin), 
- [apk](https://github.com/bmsleight/SplendidSnapApp/blob/master/app/bin/splendidsnapapp-0.1-debug.apk?raw=true)
+In the Play Store https://play.google.com/store/apps/details?id=org.barwap.splendidsnapapp
 
 ## Sets of Cards
 
